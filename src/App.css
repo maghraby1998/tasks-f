@@ -1,0 +1,7 @@
+.invalid-input-style {
+  @apply border-b border-red-500;
+}
+
+.error-validation-message {
+  @apply text-red-500 capitalize text-[15px];
+}
