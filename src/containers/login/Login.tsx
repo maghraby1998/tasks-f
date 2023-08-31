@@ -9,12 +9,16 @@ import ValidateAt from "../../enums/ValidateAt";
 import { useMutation } from "@apollo/client";
 import { LOGIN } from "../../graphql/mutations";
 import Swal from "sweetalert2";
+import { IconButton, InputAdornment } from "@mui/material";
+import { AccountCircle, Visibility, VisibilityOff } from "@mui/icons-material";
 
 const Login: React.FC = () => {
   const dispatch = useDispatch();
 
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [clientErrors, setClientErrors] = useState<string[]>([]);
+
+  const [isPasswordShown, setIsPasswordShown] = useState(false);
 
   const [formInput, setFormInput] = useState({ email: "", password: "" });
 
@@ -97,6 +101,16 @@ const Login: React.FC = () => {
           isFormSubmitted={isFormSubmitted}
           setClientErrors={setClientErrors}
           containerStyle="w-[55%] mb-3"
+          type={isPasswordShown ? "text" : "password"}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="start">
+                <IconButton onClick={() => setIsPasswordShown((prev) => !prev)}>
+                  {isPasswordShown ? <Visibility /> : <VisibilityOff />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
 
         <motion.div whileTap={{ scale: 0.8 }}>

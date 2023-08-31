@@ -1,8 +1,9 @@
 import React from "react";
 import ValidateAt from "../enums/ValidateAt";
 import InputWithValidation from "./InputWithValidation";
-import { TextField } from "@mui/material";
+import { FilledInputProps, OutlinedInputProps, TextField } from "@mui/material";
 import useValidation from "../hooks/useValidation";
+import { InputProps } from "react-select";
 
 interface Props {
   name: string;
@@ -18,6 +19,11 @@ interface Props {
   containerStyle?: string;
   autoFocus?: boolean;
   setFormData?: (callback: (arg: any) => any) => any;
+  InputProps?:
+    | Partial<FilledInputProps>
+    | Partial<OutlinedInputProps>
+    | Partial<InputProps>
+    | undefined;
 }
 
 const randomId = String(Math.random() * 999999999);
@@ -29,6 +35,7 @@ const TextInput: React.FC<Props> = ({
   placeholder,
   autoFocus,
   setFormData,
+  InputProps,
   ...props
 }) => {
   const { isValid, validationMessage } = useValidation({
@@ -60,6 +67,8 @@ const TextInput: React.FC<Props> = ({
         autoFocus={autoFocus}
         disabled={disabled}
         error={!isValid && props.isFormSubmitted}
+        type={type}
+        InputProps={InputProps}
       />
 
       {props.isFormSubmitted ? (
