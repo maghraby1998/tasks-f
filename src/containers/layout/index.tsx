@@ -11,21 +11,44 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
 import { NavLink, Outlet } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
-import { logout } from "../../redux/slices/authSlice";
+import {
+  logout,
+  toggleSideBar,
+  toggleTasksView,
+} from "../../redux/slices/authSlice";
+import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
+import Sidebar from "./Sidebar";
+import { ButtonGroup, ThemeProvider, createTheme } from "@mui/material";
+import { BorderAllRounded, List } from "@mui/icons-material";
+import TasksView from "../../enums/TasksView";
 
-const pages = [{ name: "board", to: "/" }];
+const theme = createTheme({
+  components: {
+    // Name of the component
+    MuiMenu: {
+      styleOverrides: {
+        list: () => ({
+          width: 200,
+        }),
+      },
+    },
+  },
+});
+
+// const pages = [{ name: "board", to: "/" }];
+const pages = [{}];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 const Layout = () => {
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
+  const tasksView = useSelector((state: RootState) => state.auth.tasksView);
 
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-    null
+  const isSideBarOpen = useSelector(
+    (state: RootState) => state.auth.isSideBarOpen
   );
 
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
@@ -33,14 +56,11 @@ const Layout = () => {
   );
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
+    dispatch(toggleSideBar(!isSideBarOpen));
   };
 
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
   };
 
   const handleCloseUserMenu = () => {
@@ -52,150 +72,135 @@ const Layout = () => {
     dispatch(logout());
   };
 
+  const handleChangeTasksView = (value: TasksView) => {
+    dispatch(toggleTasksView(value));
+  };
+
   return (
     <>
-      <AppBar position="static">
+      <AppBar position="static" sx={{ backgroundColor: "#61677A" }}>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
+            {!isSideBarOpen ? (
+              <IconButton
+                onClick={handleOpenNavMenu}
+                sx={{
+                  marginRight: 1,
+                  transform: "rotate(180deg)",
+                }}
+              >
+                <KeyboardDoubleArrowLeftIcon sx={{ color: "#fff" }} />
+              </IconButton>
+            ) : null}
             <Typography
               variant="h6"
               noWrap
-              component="a"
-              href="/"
+              // component="a"
+              // href="/"
               sx={{
                 mr: 2,
-                display: { xs: "none", md: "flex" },
+                display: "fl  ex",
                 fontFamily: "monospace",
                 fontWeight: 700,
-                letterSpacing: ".3rem",
+                letterSpacing: ".1rem",
                 color: "inherit",
                 textDecoration: "none",
+                textTransform: "capitalize",
               }}
             >
-              TASKS
+              space
             </Typography>
-
-            {/* start of small screen */}
-            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleOpenNavMenu}
-                color="inherit"
-              >
-                <MenuIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorElNav}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "left",
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "left",
-                }}
-                open={Boolean(anchorElNav)}
-                onClose={handleCloseNavMenu}
-                sx={{
-                  display: { xs: "block", md: "none" },
-                }}
-              >
-                {pages.map((page) => (
-                  <MenuItem onClick={handleCloseNavMenu}>
-                    <NavLink
-                      to={page.to}
-                      className={({ isActive }) =>
-                        `px-2 ${
-                          isActive ? "bg-white rounded text-blue-400 " : ""
-                        }`
-                      }
-                    >
-                      {page.name}
-                    </NavLink>
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-            <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
-            <Typography
-              variant="h5"
-              noWrap
-              component="a"
-              href="/"
-              sx={{
-                mr: 2,
-                display: { xs: "flex", md: "none" },
-                flexGrow: 1,
-                fontFamily: "monospace",
-                fontWeight: 700,
-                letterSpacing: ".3rem",
-                color: "inherit",
-                textDecoration: "none",
-              }}
-            >
-              TASKS
-            </Typography>
-            {/* end of small screen */}
 
             {/* start of big screen */}
-            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-              {pages.map((page) => (
-                <NavLink
-                  to={page.to}
-                  className={({ isActive }) =>
-                    `px-2 ${isActive ? "bg-white rounded text-blue-400 " : ""}`
-                  }
-                  onClick={handleCloseNavMenu}
-                >
-                  {page.name}
-                </NavLink>
-              ))}
-            </Box>
+
+            <ButtonGroup sx={{ alignItems: "center", flexGrow: 1, ml: 3 }}>
+              <IconButton
+                sx={{
+                  color: "white",
+                  borderRadius: 1,
+                  width: 80,
+                  height: 30,
+                  ...(tasksView === TasksView.board
+                    ? {
+                        backgroundColor: "#fff",
+                        color: "#61677A",
+                        ":hover": { backgroundColor: "#fff" },
+                      }
+                    : {}),
+                }}
+                onClick={() => handleChangeTasksView(TasksView.board)}
+              >
+                <BorderAllRounded sx={{ marginRight: "2px" }} />
+                <p className="capitalize text-sm">board</p>
+              </IconButton>
+
+              <IconButton
+                sx={{
+                  color: "white",
+                  borderRadius: 1,
+                  width: 80,
+                  height: 30,
+                  ...(tasksView === TasksView.list
+                    ? {
+                        backgroundColor: "#fff",
+                        color: "#61677A",
+                        ":hover": { backgroundColor: "#fff" },
+                      }
+                    : {}),
+                }}
+                onClick={() => handleChangeTasksView(TasksView.list)}
+              >
+                <List sx={{ marginRight: "2px" }} />
+                <p className="capitalize text-sm">list</p>
+              </IconButton>
+            </ButtonGroup>
 
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar
-                    alt={user.name ?? "user name"}
+                    alt={user?.name ?? "user name"}
                     src="/static/images/avatar/2.jpg"
                   />
                 </IconButton>
               </Tooltip>
-              <Menu
-                sx={{ mt: "45px", minWidth: 1 }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-                <p>{user && user.name}</p>
-                {/* {settings.map((setting) => ( */}
-                <MenuItem onClick={handleLogout}>
-                  <Typography textAlign="center">logout</Typography>
-                </MenuItem>
-                {/* ))} */}
-              </Menu>
+              <ThemeProvider theme={theme}>
+                <Menu
+                  sx={{
+                    mt: "45px",
+                    width: 200,
+                    minWidth: 200,
+                    maxWidth: "unset",
+                  }}
+                  id="menu-appbar"
+                  anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  open={Boolean(anchorElUser)}
+                  onClose={handleCloseUserMenu}
+                >
+                  <p className="px-[15px] border-b pb-2">{user && user.name}</p>
+                  {/* {settings.map((setting) => ( */}
+                  <MenuItem onClick={handleLogout}>
+                    <Typography textAlign="center">logout</Typography>
+                  </MenuItem>
+                  {/* ))} */}
+                </Menu>
+              </ThemeProvider>
             </Box>
             {/* end of big screen */}
           </Toolbar>
         </Container>
       </AppBar>
       <Outlet />
+      {isSideBarOpen ? <Sidebar /> : null}
     </>
   );
 };

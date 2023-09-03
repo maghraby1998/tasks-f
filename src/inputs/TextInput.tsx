@@ -1,7 +1,12 @@
 import React from "react";
 import ValidateAt from "../enums/ValidateAt";
 import InputWithValidation from "./InputWithValidation";
-import { FilledInputProps, OutlinedInputProps, TextField } from "@mui/material";
+import {
+  FilledInputProps,
+  OutlinedInputProps,
+  TextField,
+  TextFieldVariants,
+} from "@mui/material";
 import useValidation from "../hooks/useValidation";
 import { InputProps } from "react-select";
 
@@ -24,6 +29,8 @@ interface Props {
     | Partial<OutlinedInputProps>
     | Partial<InputProps>
     | undefined;
+  className?: string;
+  inputVariant?: TextFieldVariants | undefined;
 }
 
 const randomId = String(Math.random() * 999999999);
@@ -36,6 +43,8 @@ const TextInput: React.FC<Props> = ({
   autoFocus,
   setFormData,
   InputProps,
+  className,
+  inputVariant = "outlined",
   ...props
 }) => {
   const { isValid, validationMessage } = useValidation({
@@ -59,11 +68,11 @@ const TextInput: React.FC<Props> = ({
       <TextField
         id="outlined-basic"
         label={placeholder}
-        variant="outlined"
+        variant={inputVariant}
         name={props.name}
         value={props.value}
         onChange={onChange ? onChange : handleInputChange}
-        className="w-full outline-none border border-1 border-black block px-2 rounded"
+        className={`w-full outline-none border border-1 border-black block px-2 rounded ${className}`}
         autoFocus={autoFocus}
         disabled={disabled}
         error={!isValid && props.isFormSubmitted}

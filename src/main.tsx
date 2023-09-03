@@ -9,13 +9,13 @@ import { client } from "./graphql/client";
 import { ApolloProvider } from "@apollo/client";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <PersistGate persistor={persistor}>
-      <Provider store={store}>
-        <ApolloProvider client={client}>
-          <App />
-        </ApolloProvider>
-      </Provider>
-    </PersistGate>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <PersistGate persistor={persistor}>
+    <Provider store={store}>
+      <ApolloProvider client={client}>
+        <App />
+      </ApolloProvider>
+    </Provider>
+  </PersistGate>
+  // </React.StrictMode>
 );

@@ -29,6 +29,8 @@ const Board: React.FC = () => {
   const handleDrop = (e: any, boardStageId: number) => {
     e.preventDefault();
 
+    if (boardStageId === draggedTaskDetails?.boardStageId) return;
+
     setBoard((prev) => {
       return prev.map((boardStage) => {
         if (boardStage.id === boardStageId) {
@@ -61,7 +63,7 @@ const Board: React.FC = () => {
               {boardStage.name}
             </p>
             <div
-              className="pb-[30px]"
+              className="pb-[30px] min-h-screen"
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => handleDrop(e, boardStage.id)}
             >

@@ -5,3 +5,32 @@
 .error-validation-message {
   @apply text-red-500 capitalize text-[15px];
 }
+
+.page-container {
+  @apply py-2 px-[24px];
+}
+
+.page-title {
+  @apply capitalize font-semibold text-primary-color text-[20px] border-b border-b-slate-500;
+}
+
+.App {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.list-container {
+  display: flex;
+  font-size: 18px;
+  flex-direction: column;
+}
+
+.item-container {
+  @apply border;
+  background-color: #fff;
+  width: 400px;
+  display: flex;
+  align-items: center;
+  height: 50px;
+}
