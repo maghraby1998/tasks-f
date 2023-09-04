@@ -7,7 +7,7 @@
 }
 
 .page-container {
-  @apply py-2 px-[24px];
+  @apply py-2 px-[24px] mt-[80px];
 }
 
 .page-title {
@@ -33,4 +33,9 @@
   display: flex;
   align-items: center;
   height: 50px;
+}
+
+.custom-modal-style {
+  @apply mx-auto rounded overflow-scroll;
+  margin-top: calc(100vh * 0.2);
 }

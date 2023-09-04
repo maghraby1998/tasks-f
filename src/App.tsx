@@ -24,7 +24,12 @@ const App = () => {
     createRoutesFromElements(
       token ? (
         <Route path="/" element={<Layout />}>
-          <Route index element={<div>should make a home page i guess</div>} />
+          <Route
+            index
+            element={
+              <div className="page-container">home page in progress</div>
+            }
+          />
           <Route path="/board/:id" element={<Board />} />
           <Route path="/create-project" element={<CreateProject />} />
           <Route path="*" element={<Navigate to={"/"} />} />

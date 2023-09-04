@@ -24,3 +24,31 @@ export const LOGIN = gql`
     }
   }
 `;
+
+export const upsertProject = gql`
+  mutation upsertProject($input: UpsertProjectInput) {
+    upsertProject(input: $input) {
+      __typename
+      id
+      name
+    }
+  }
+`;
+
+export const upsertTask = gql`
+  mutation UpsertTask($input: CreateTaskInput) {
+    createTask(input: $input) {
+      __typename
+      id
+    }
+  }
+`;
+
+export const updateTaskStage = gql`
+  mutation UpdateTaskStage($input: UpdateTaskStageInput) {
+    updateTaskStage(input: $input) {
+      __typename
+      id
+    }
+  }
+`;

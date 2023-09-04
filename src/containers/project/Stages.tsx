@@ -4,9 +4,19 @@ import TextInput from "../../inputs/TextInput";
 import { Add, DeleteForever, DragHandle } from "@mui/icons-material";
 import { IconButton, Slide } from "@mui/material";
 
-const Stages = () => {
-  const [stages, setStages] = useState<{ order: number; name: string }[]>([]);
+interface Props {
+  stages: { order: number; name: string }[];
+  setStages: React.Dispatch<
+    React.SetStateAction<
+      {
+        order: number;
+        name: string;
+      }[]
+    >
+  >;
+}
 
+const Stages: React.FC<Props> = ({ stages, setStages }) => {
   const [isDraggingMode, setIsDraggingMode] = useState(false);
 
   // Function to update list on drop
@@ -68,8 +78,6 @@ const Stages = () => {
     // Update State
     setStages(result);
   };
-
-  console.log(stages);
 
   return (
     <div>
@@ -188,7 +196,7 @@ const Stages = () => {
                         transform: "translate(-50%, -50%)",
                         width: 60,
                         height: 60,
-                        color: state.isDraggingOver ? "#fff" : "black",
+                        color: state.isDraggingOver ? "#fff" : "#333",
                       }}
                     />
                   </div>

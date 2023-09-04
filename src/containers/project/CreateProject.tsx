@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import TextInput from "../../inputs/TextInput";
 import ValidateAt from "../../enums/ValidateAt";
 import Stages from "./Stages";
+import { Alert, IconButton, Snackbar } from "@mui/material";
+import { Save } from "@mui/icons-material";
+import { useMutation } from "@apollo/client";
+import { upsertProject } from "../../graphql/mutations";
+import { projects } from "../../graphql/queries";
+import { useNavigate } from "react-router-dom";
 
 interface Stage {
   name: string;
@@ -16,26 +22,54 @@ interface FormData {
 const formInitialState = { id: null, name: "" };
 
 const CreateProject = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState<FormData>(formInitialState);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [stages, setStages] = useState<{ order: number; name: string }[]>([]);
   const [clientErrors, setClientErrors] = useState([]);
+  const [isSnackBarOpen, setIsSnackBarOpen] = useState(false);
+
+  const [attemptUpsertProject, { loading: upsertProjectLoading }] = useMutation(
+    upsertProject,
+    {
+      variables: {
+        input: { name: formData.name, stages },
+      },
+      onCompleted: (data) => {
+        navigate(`/board/${data?.upsertProject?.id}`);
+      },
+      refetchQueries: [{ query: projects }],
+    }
+  );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsFormSubmitted(true);
+
+    const unNamedStage = stages.find((stage) => !!!stage.name);
+
+    if (unNamedStage) {
+      setIsSnackBarOpen(true);
+      return;
+    }
+
+    if (clientErrors.length) return;
+
+    attemptUpsertProject();
   };
 
   return (
     <div className="page-container">
       <h2 className="page-title mb-6">new project</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="flex flex-col">
         <TextInput
           name="name"
           value={formData?.name}
           isFormSubmitted={isFormSubmitted}
           setClientErrors={setClientErrors}
           setFormData={setFormData}
-          placeholder="name"
+          placeholder="Name"
           validateAt={ValidateAt.isString}
           containerStyle="mb-5"
           autoFocus
@@ -45,8 +79,43 @@ const CreateProject = () => {
           project stages
         </h3>
 
-        <Stages />
+        <Stages stages={stages} setStages={setStages} />
+
+        <IconButton
+          type="submit"
+          sx={{
+            fontSize: 18,
+            textTransform: "capitalize",
+            backgroundColor: "#61677A",
+            color: "#fff",
+            height: 30,
+            width: 100,
+            borderRadius: 1,
+            marginTop: 2,
+            alignSelf: "flex-end",
+            ":hover": {
+              backgroundColor: "#6E7486",
+            },
+          }}
+        >
+          save
+        </IconButton>
       </form>
+
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={isSnackBarOpen}
+        // autoHideDuration={6000}
+        onClose={() => setIsSnackBarOpen(false)}
+      >
+        <Alert
+          onClose={() => setIsSnackBarOpen(false)}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          Please name all the created stages otherwise delete the unnamed ones.
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

@@ -78,7 +78,16 @@ const Layout = () => {
 
   return (
     <>
-      <AppBar position="static" sx={{ backgroundColor: "#61677A" }}>
+      <AppBar
+        position="fixed"
+        sx={{
+          backgroundColor: "#61677A",
+          marginLeft: isSideBarOpen ? "250px" : 0,
+          top: 0,
+          left: 0,
+          width: isSideBarOpen ? "calc(100vw - 250px)" : "100%",
+        }}
+      >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             {!isSideBarOpen ? (

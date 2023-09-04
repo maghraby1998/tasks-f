@@ -41,7 +41,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 min-h-screen border-r border-r-slate-300 w-[250px]">
+    <div className="fixed top-0 left-0 h-screen overflow-auto border-r border-r-slate-300 w-[250px]">
       <div className="h-[65px] flex items-center justify-between pl-5 border-b  bg-secondary-color text-primary-color">
         <h2 className="uppercase font-semibold ">tasks</h2>
         <IconButton onClick={handleCloseNavbar} sx={{ mr: 1 }}>
@@ -66,7 +66,7 @@ const Sidebar = () => {
           <AccountTree sx={{ marginRight: 1 }} />{" "}
           <p className="capitalize">projects</p>
         </AccordionSummary>
-        <AccordionDetails sx={{ padding: 0 }}>
+        <AccordionDetails sx={{ padding: 0, maxHeight: 300, overflow: "auto" }}>
           <div className="p-3">
             {projectsData?.projects?.map((project: any, index: number) => (
               <motion.div whileTap={{ scale: 0.8 }}>
@@ -74,7 +74,7 @@ const Sidebar = () => {
                   in={expandedAccordion === "projects"}
                   style={{ transformOrigin: "0 0 0" }}
                   {...(expandedAccordion === "projects"
-                    ? { timeout: 1000 * (index - 1) }
+                    ? { timeout: 100 * (index - 1) }
                     : {})}
                 >
                   <NavLink
