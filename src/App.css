@@ -39,3 +39,8 @@
   @apply mx-auto rounded overflow-scroll;
   margin-top: calc(100vh * 0.2);
 }
+
+.text-orientation-down {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}

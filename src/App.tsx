@@ -26,9 +26,7 @@ const App = () => {
         <Route path="/" element={<Layout />}>
           <Route
             index
-            element={
-              <div className="page-container">home page in progress</div>
-            }
+            element={<div className="page-container">in progress</div>}
           />
           <Route path="/board/:id" element={<Board />} />
           <Route path="/create-project" element={<CreateProject />} />

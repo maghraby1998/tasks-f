@@ -100,14 +100,14 @@ const Board: React.FC = () => {
 
   const [isMouseDown, setIsMouseDown] = useState(false);
 
-  const handleDragStart = (e: any) => {
+  const handleMouseDown = (e: any) => {
     if (!ourRef.current || isDraggingMode) return;
     const slider = ourRef.current;
     setIsMouseDown(true);
     slider.style.cursor = "grabbing";
   };
 
-  const handleDragEnd = () => {
+  const handleMouseUp = () => {
     setIsMouseDown(false);
     if (!ourRef.current) return;
     const slider = ourRef.current;
@@ -115,21 +115,25 @@ const Board: React.FC = () => {
     slider.style.cursor = "grab";
   };
 
-  const handleDrag = (e) => {
+  const handleMouseMove = (e) => {
     if (!isMouseDown || !ourRef.current || isDraggingMode) return;
     e.preventDefault();
     const slider = ourRef.current;
     slider.scrollLeft =
-      e?.movementX > 0 ? slider.scrollLeft - 20 : slider.scrollLeft + 20;
+      e?.movementX > 0 ? slider.scrollLeft - 12 : slider.scrollLeft + 12;
+  };
+
+  const handleEditTask = (taskId: number) => {
+    console.log(taskId);
   };
 
   return (
     <div className="py-2 mt-[80px] max-w-full overflow-hidden m-0">
       <div
         ref={ourRef}
-        onMouseDown={handleDragStart}
-        onMouseUp={handleDragEnd}
-        onMouseMove={handleDrag}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
         className={"overflow-x-auto"}
       >
         <div className="flex gap-10 p-5">
@@ -164,9 +168,14 @@ const Board: React.FC = () => {
                               ref={provided.innerRef}
                             >
                               <div className="h-[30px] bg-primary-color px-2 rounded-sm flex items-center justify-between">
-                                <h3 className="text-white capitalize">
-                                  {stage?.name}
-                                </h3>
+                                <div className="flex items-center">
+                                  <h3 className="text-white capitalize text-sm mr-2 font-bold">
+                                    {stage?.name}
+                                  </h3>
+                                  <p className="text-sm bg-white h-[18px] w-[18px] rounded-full flex items-center justify-center">
+                                    {stage?.tasks?.length}
+                                  </p>
+                                </div>
 
                                 <div className="flex items-center">
                                   <IconButton
@@ -180,7 +189,7 @@ const Board: React.FC = () => {
                                 </div>
                               </div>
 
-                              <div className="overflow-auto h-[calc(100vh-120px)]">
+                              <div className="overflow-auto h-[calc(100vh-180px)]">
                                 {stage?.tasks?.map((task, index) => (
                                   <>
                                     <Draggable
@@ -191,12 +200,17 @@ const Board: React.FC = () => {
                                       {(provideddd) => {
                                         return (
                                           <div
-                                            className="bg-gray-400/20 p-2 my-2 min-h-[100px]"
+                                            onClick={() =>
+                                              handleEditTask(task?.id)
+                                            }
+                                            className="bg-gray-400/20 p-2 my-2 min-h-[100px] rounded"
                                             ref={provideddd.innerRef}
                                             {...provideddd.dragHandleProps}
                                             {...provideddd.draggableProps}
                                           >
-                                            <p>{task?.name}</p>
+                                            <p className="text-sm capitalize">
+                                              {task?.name}
+                                            </p>
                                           </div>
                                         );
                                       }}
@@ -206,16 +220,21 @@ const Board: React.FC = () => {
                                 <IconButton
                                   sx={{
                                     borderRadius: "4px",
-                                    height: 30,
                                     display: "none",
+                                    width: "fit-content",
                                     marginTop: 1,
                                     backgroundColor: "#999",
-                                    padding: "0px",
+                                    padding: "4px",
+                                    color: " #fff",
+                                    ":hover": {
+                                      backgroundColor: "#777",
+                                    },
                                   }}
                                   onClick={() => handleOpenTaskModal(stage?.id)}
                                   className="unique-icon-button-class"
                                 >
-                                  <Add />
+                                  <Add sx={{ height: 15, width: 15 }} />
+                                  <p className="text-sm capitalize">new</p>
                                 </IconButton>
                                 {provided.placeholder}
                               </div>
@@ -224,16 +243,22 @@ const Board: React.FC = () => {
                         </Droppable>
                       </div>
                     ) : (
-                      <div className="w-[40px] min-h-[200px] bg-primary-color rounded-sm">
+                      <div className="w-[40px] min-h-[350px] bg-primary-color rounded-sm">
                         <IconButton
-                          sx={{ color: "#fff", marginBottom: 4 }}
+                          sx={{ color: "#fff", marginBottom: 2 }}
                           onClick={() => handleUnCollapseStage(stage?.id)}
                         >
                           <KeyboardArrowRight />
                         </IconButton>
-                        <h3 className="text-white capitalize rotate-90 whitespace-nowrap w-full">
-                          {stage?.name}
-                        </h3>
+                        <div className="flex flex-col items-center justify-center">
+                          <h3 className="text-white capitalize mb-2 text-orientation-down">
+                            {stage?.name}
+                          </h3>
+
+                          <p className="text-sm bg-white h-[18px] w-[18px] rounded-full flex items-center justify-center text-orientation-down">
+                            {stage?.tasks?.length}
+                          </p>
+                        </div>
                       </div>
                     )}
                   </Grow>
@@ -268,12 +293,6 @@ const Board: React.FC = () => {
           </Alert>
         </Snackbar>
       </div>
-      <button
-        className="positoin-fixed top-0 right-0"
-        onClick={() => console.log(ourRef.current.scrollLeft)}
-      >
-        console
-      </button>
     </div>
   );
 };
