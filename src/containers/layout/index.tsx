@@ -21,7 +21,8 @@ import {
 } from "../../redux/slices/authSlice";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import Sidebar from "./Sidebar";
-import { ButtonGroup, ThemeProvider, createTheme } from "@mui/material";
+import { ButtonGroup, ThemeProvider } from "@mui/material";
+import {  createTheme } from "@mui/material/styles";
 import { BorderAllRounded, List } from "@mui/icons-material";
 import TasksView from "../../enums/TasksView";
 

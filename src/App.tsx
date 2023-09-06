@@ -47,7 +47,7 @@ const App = () => {
   return (
     <div
       className={`${
-        isSideBarOpen ? "max-w-[calc(100vw-250px)]" : "max-w-screen"
+        isSideBarOpen && token ? "max-w-[calc(100vw-250px)]" : "max-w-screen"
       } ml-auto`}
     >
       <RouterProvider router={router} />
