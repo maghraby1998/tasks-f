@@ -30,6 +30,7 @@ const App = () => {
           />
           <Route path="/board/:id" element={<Board />} />
           <Route path="/create-project" element={<CreateProject />} />
+          <Route path="/edit-project/:id" element={<CreateProject />} />
           <Route path="*" element={<Navigate to={"/"} />} />
         </Route>
       ) : (

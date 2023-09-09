@@ -8,12 +8,15 @@ import {
   Add,
   KeyboardArrowLeft,
   KeyboardArrowRight,
+  Settings,
 } from "@mui/icons-material";
 import TaskForm from "../../components/TaskForm";
 import { updateTaskStage } from "../../graphql/mutations";
+import { useNavigate } from "react-router-dom";
 
 const Board: React.FC = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [isSnackBarOpen, setIsSnackBarOpen] = useState(false);
 
@@ -127,8 +130,20 @@ const Board: React.FC = () => {
     console.log(taskId);
   };
 
+  const handleEditProject = () => {
+    navigate(`/edit-project/${projectData?.project?.id}`);
+  };
+
   return (
     <div className="py-2 mt-[80px] max-w-full overflow-hidden m-0">
+      <div className="mx-5 p-2 rounded-sm bg-secondary-color flex items-center justify-between">
+        <h2 className="capitalize text-[#333] font-bold">
+          {projectData?.project?.name}
+        </h2>
+        <IconButton onClick={handleEditProject}>
+          <Settings />
+        </IconButton>
+      </div>
       <div
         ref={ourRef}
         onMouseDown={handleMouseDown}
@@ -169,7 +184,10 @@ const Board: React.FC = () => {
                             >
                               <div className="h-[30px] bg-primary-color px-2 rounded-sm flex items-center justify-between">
                                 <div className="flex items-center">
-                                  <h3 className="text-white capitalize text-sm mr-2 font-bold">
+                                  <h3
+                                    title={stage?.name}
+                                    className="text-white capitalize text-sm mr-2 font-bold truncate w-[120px]"
+                                  >
                                     {stage?.name}
                                   </h3>
                                   <p className="text-sm bg-white h-[18px] w-[18px] rounded-full flex items-center justify-center">

@@ -1,7 +1,24 @@
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+import { store } from "../redux/store";
+import { setContext } from "@apollo/client/link/context";
+
+const httpLink = createHttpLink({
+  uri: "http://localhost:5000/graphql",
+});
+
+const authLink = setContext((_, { headers }) => {
+  const token = store.getState().auth.token;
+
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : "",
+    },
+  };
+});
 
 export const client = new ApolloClient({
-  uri: "http://localhost:5000/graphql",
+  link: authLink.concat(httpLink),
 
   cache: new InMemoryCache({ addTypename: false }),
 

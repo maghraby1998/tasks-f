@@ -35,6 +35,21 @@ export const upsertProject = gql`
   }
 `;
 
+export const updateProject = gql`
+  mutation updateProject($input: UpdateProjectInput) {
+    updateProject(input: $input) {
+      __typename
+      id
+      name
+      stages {
+        __typename
+        id
+        name
+      }
+    }
+  }
+`;
+
 export const upsertTask = gql`
   mutation UpsertTask($input: CreateTaskInput) {
     createTask(input: $input) {
