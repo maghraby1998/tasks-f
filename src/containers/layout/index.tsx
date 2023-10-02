@@ -25,6 +25,7 @@ import { ButtonGroup, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { BorderAllRounded, List } from "@mui/icons-material";
 import TasksView from "../../enums/TasksView";
+import { client } from "../../graphql/client";
 
 const theme = createTheme({
   components: {
@@ -70,6 +71,7 @@ const Layout = () => {
 
   const handleLogout = () => {
     handleCloseUserMenu();
+    client.resetStore();
     dispatch(logout());
   };
 

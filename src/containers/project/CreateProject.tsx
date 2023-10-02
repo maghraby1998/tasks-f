@@ -9,6 +9,7 @@ import { updateProject, upsertProject } from "../../graphql/mutations";
 import { project, projects } from "../../graphql/queries";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+// import Members from "./Members";
 
 interface Stage {
   name: string;
@@ -121,6 +122,8 @@ const CreateProject = () => {
         </h3>
 
         <Stages stages={stages} setStages={setStages} />
+
+        {/* <Members /> */}
 
         <IconButton
           type="submit"

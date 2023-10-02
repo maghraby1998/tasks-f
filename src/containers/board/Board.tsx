@@ -1,18 +1,20 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { project } from "../../graphql/queries";
+import { GET_TASK, project } from "../../graphql/queries";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { Alert, Box, Grow, IconButton, Snackbar } from "@mui/material";
 import {
   Add,
   KeyboardArrowLeft,
   KeyboardArrowRight,
+  PersonAddAlt,
   Settings,
 } from "@mui/icons-material";
 import TaskForm from "../../components/TaskForm";
 import { updateTaskStage } from "../../graphql/mutations";
 import { useNavigate } from "react-router-dom";
+import InvitationDialog from "../invitations/InvitationDialog";
 
 const Board: React.FC = () => {
   const { id } = useParams();
@@ -24,8 +26,8 @@ const Board: React.FC = () => {
 
   const [taskModalData, setTaskModalData] = useState<{
     isOpen: boolean;
-    projectId: number | null;
-    stageId: number | null;
+    projectId?: number | null;
+    stageId?: number | null;
   }>({
     isOpen: false,
     projectId: null,
@@ -33,6 +35,7 @@ const Board: React.FC = () => {
   });
 
   const [taskFormData, setTaskFormData] = useState<{
+    id?: number | null;
     name: string;
     userIds: string[];
   }>({ name: "", userIds: [] });
@@ -52,6 +55,7 @@ const Board: React.FC = () => {
   };
 
   const { loading: projectLoading, data: projectData } = useQuery(project, {
+    fetchPolicy: "network-only",
     variables: {
       id,
     },
@@ -126,12 +130,35 @@ const Board: React.FC = () => {
       e?.movementX > 0 ? slider.scrollLeft - 12 : slider.scrollLeft + 12;
   };
 
-  const handleEditTask = (taskId: number) => {
-    console.log(taskId);
+  const [attemptGetTask, { loading: getTaskLoading }] = useLazyQuery(GET_TASK, {
+    onCompleted: (data) => {
+      console.log(data);
+      const { id, name, users } = data?.task ?? {};
+      setTaskModalData({ isOpen: true });
+      setTaskFormData({ id, name, userIds: [] });
+    },
+  });
+
+  const handleEditTask = (id: number) => {
+    attemptGetTask({
+      variables: {
+        id,
+      },
+    });
   };
 
   const handleEditProject = () => {
     navigate(`/edit-project/${projectData?.project?.id}`);
+  };
+
+  const [isInvitationModalOpen, setIsInvitationModalOpen] = useState(false);
+
+  const handleInviteUser = () => {
+    setIsInvitationModalOpen(true);
+  };
+
+  const handleCloseInvitationModal = () => {
+    setIsInvitationModalOpen(false);
   };
 
   return (
@@ -140,16 +167,21 @@ const Board: React.FC = () => {
         <h2 className="capitalize text-[#333] font-bold">
           {projectData?.project?.name}
         </h2>
-        <IconButton onClick={handleEditProject}>
-          <Settings />
-        </IconButton>
+        <div className="flex items-center justify-center">
+          <IconButton onClick={handleInviteUser}>
+            <PersonAddAlt />
+          </IconButton>
+          <IconButton onClick={handleEditProject}>
+            <Settings />
+          </IconButton>
+        </div>
       </div>
       <div
         ref={ourRef}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
-        className={"overflow-x-auto"}
+        className="overflow-x-auto"
       >
         <div className="flex gap-10 p-5">
           <DragDropContext
@@ -221,7 +253,7 @@ const Board: React.FC = () => {
                                             onClick={() =>
                                               handleEditTask(task?.id)
                                             }
-                                            className="bg-gray-400/20 p-2 my-2 min-h-[100px] rounded"
+                                            className="bg-gray-400/20 p-2 my-2 min-h-[100px] rounded-sm"
                                             ref={provideddd.innerRef}
                                             {...provideddd.dragHandleProps}
                                             {...provideddd.draggableProps}
@@ -311,6 +343,14 @@ const Board: React.FC = () => {
           </Alert>
         </Snackbar>
       </div>
+
+      {id ? (
+        <InvitationDialog
+          open={isInvitationModalOpen}
+          onClose={handleCloseInvitationModal}
+          projectId={+id}
+        />
+      ) : null}
     </div>
   );
 };

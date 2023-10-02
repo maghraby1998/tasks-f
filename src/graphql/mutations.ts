@@ -67,3 +67,50 @@ export const updateTaskStage = gql`
     }
   }
 `;
+
+export const UPDATE_TASK = gql`
+  mutation updateTask($input: UpdateTaskInput) {
+    updateTask(input: $input) {
+      __typename
+      id
+      name
+      users {
+        __typename
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const INVITE_USER_TO_PROJECT = gql`
+  mutation inviteUserToProject($input: InviteUserToProjectInput) {
+    inviteUserToProject(input: $input) {
+      id
+    }
+  }
+`;
+
+export const ACCEPT_INVITATION = gql`
+  mutation acceptInviation($invitationId: Int!) {
+    acceptInvitation(invitationId: $invitationId) {
+      id
+    }
+  }
+`;
+
+export const REJECT_INVITATION = gql`
+  mutation rejectInviation($invitationId: Int!) {
+    rejectInvitation(invitationId: $invitationId) {
+      id
+    }
+  }
+`;
+
+export const CANCEL_INVITATION = gql`
+  mutation cancelInviation($invitationId: Int!) {
+    cancelInvitation(invitationId: $invitationId) {
+      id
+    }
+  }
+`;

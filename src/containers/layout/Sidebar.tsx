@@ -127,7 +127,7 @@ const Sidebar = () => {
           }}
         >
           <AccountTree sx={{ marginRight: 1 }} />{" "}
-          <p className="capitalize">manage projects</p>
+          <p className="capitalize">Invitations</p>
         </AccordionSummary>
         <AccordionDetails sx={{ padding: 0 }}>
           <div className="p-3">
@@ -147,9 +147,31 @@ const Sidebar = () => {
                         : "hover:bg-secondary-color/40"
                     } capitalize my-1 block p-1 rounded `
                   }
-                  to={`/manage-projects`}
+                  to={`/sent-invitations`}
                 >
-                  manage projects
+                  sent
+                </NavLink>
+              </Grow>
+            </motion.div>
+            <motion.div whileTap={{ scale: 0.8 }}>
+              <Grow
+                in={expandedAccordion === "manage-projects"}
+                style={{ transformOrigin: "0 0 0" }}
+                {...(expandedAccordion === "manage-projects"
+                  ? { timeout: 1000 }
+                  : {})}
+              >
+                <NavLink
+                  className={({ isActive }) =>
+                    `${
+                      isActive
+                        ? "bg-secondary-color text-primary-color"
+                        : "hover:bg-secondary-color/40"
+                    } capitalize my-1 block p-1 rounded `
+                  }
+                  to={`/received-invitations`}
+                >
+                  received
                 </NavLink>
               </Grow>
             </motion.div>

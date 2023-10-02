@@ -4,25 +4,26 @@ import TextInput from "../inputs/TextInput";
 import ValidateAt from "../enums/ValidateAt";
 import { IconButton } from "@mui/material";
 import { useMutation } from "@apollo/client";
-import { upsertTask } from "../graphql/mutations";
+import { UPDATE_TASK, upsertTask } from "../graphql/mutations";
 import { project } from "../graphql/queries";
 
 interface Props {
   modalData: {
     isOpen: boolean;
-    projectId: number | null;
-    stageId: number | null;
+    projectId?: number | null;
+    stageId?: number | null;
   };
   setModalData: React.Dispatch<
     React.SetStateAction<{
       isOpen: boolean;
-      projectId: number | null;
-      stageId: number | null;
+      projectId?: number | null;
+      stageId?: number | null;
     }>
   >;
-  formData: { name: string; userIds: string[] };
+  formData: { id?: number | null; name: string; userIds: string[] };
   setFormData: React.Dispatch<
     React.SetStateAction<{
+      id?: number | null;
       name: string;
       userIds: string[];
     }>
@@ -61,13 +62,33 @@ const TaskForm: React.FC<Props> = ({
     }
   );
 
+  const [attemptUpdateTask, { loading: updateTaskLoading }] = useMutation(
+    UPDATE_TASK,
+    {
+      variables: {
+        input: {
+          id: formData?.id,
+          name: formData?.name,
+          usersIds: formData?.userIds,
+        },
+      },
+      onCompleted: (data) => {
+        handleCloseModal();
+      },
+    }
+  );
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsFormSubmitted(true);
 
     if (clientErrors.length) return;
 
-    attemptUpsertTask();
+    if (formData?.id) {
+      attemptUpdateTask();
+    } else {
+      attemptUpsertTask();
+    }
   };
 
   const handleCloseModal = () => {
@@ -95,6 +116,7 @@ const TaskForm: React.FC<Props> = ({
           isFormSubmitted={isFormSubmitted}
           validateAt={ValidateAt.isString}
           autoFocus
+          setClientErrors={setClientErrors}
         />
 
         <IconButton

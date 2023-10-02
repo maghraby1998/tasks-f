@@ -12,6 +12,8 @@ import { RootState } from "./redux/store";
 import Board from "./containers/board/Board";
 import Layout from "./containers/layout";
 import CreateProject from "./containers/project/CreateProject";
+import SentInvitations from "./containers/invitations/SentInvitations";
+import ReceivedInvitations from "./containers/invitations/ReceivedInvitations";
 
 const App = () => {
   const token = useSelector((state: RootState) => state.auth.token);
@@ -31,6 +33,11 @@ const App = () => {
           <Route path="/board/:id" element={<Board />} />
           <Route path="/create-project" element={<CreateProject />} />
           <Route path="/edit-project/:id" element={<CreateProject />} />
+          <Route path="/sent-invitations" element={<SentInvitations />} />
+          <Route
+            path="/received-invitations"
+            element={<ReceivedInvitations />}
+          />
           <Route path="*" element={<Navigate to={"/"} />} />
         </Route>
       ) : (
