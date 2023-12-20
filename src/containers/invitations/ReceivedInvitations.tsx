@@ -1,9 +1,16 @@
-import { useQuery } from "@apollo/client";
+import { useQuery, useSubscription } from "@apollo/client";
 import { GET_RECEIVED_INVITATIONS } from "../../graphql/queries";
 import InvitationCard from "./InvitationCard";
+import { INVITATION_ACCEPTED } from "../../graphql/queries";
 
 const ReceivedInvitations = () => {
-  const { data, loading } = useQuery(GET_RECEIVED_INVITATIONS);
+  const { data, loading } = useQuery(GET_RECEIVED_INVITATIONS, {
+    fetchPolicy: "cache-and-network",
+  });
+
+  const { data: subData } = useSubscription(INVITATION_ACCEPTED);
+
+  console.log("sub data", subData);
 
   return (
     <div className="page-container">

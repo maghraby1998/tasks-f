@@ -3,7 +3,9 @@ import { GET_SENT_INVITATIONS } from "../../graphql/queries";
 import InvitationCard from "./InvitationCard";
 
 const SentInvitations = () => {
-  const { data, loading } = useQuery(GET_SENT_INVITATIONS);
+  const { data, loading } = useQuery(GET_SENT_INVITATIONS, {
+    fetchPolicy: "cache-and-network",
+  });
 
   return (
     <div className="page-container">

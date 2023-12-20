@@ -7,13 +7,13 @@ import { motion } from "framer-motion";
 import TextInput from "../../inputs/TextInput";
 import ValidateAt from "../../enums/ValidateAt";
 import { useMutation } from "@apollo/client";
-import { LOGIN } from "../../graphql/mutations";
+import { LOGIN, SIGNUP } from "../../graphql/mutations";
 import Swal from "sweetalert2";
 import { IconButton, InputAdornment } from "@mui/material";
 import { AccountCircle, Visibility, VisibilityOff } from "@mui/icons-material";
 import { NavLink } from "react-router-dom";
 
-const Login: React.FC = () => {
+const SignUp: React.FC = () => {
   const dispatch = useDispatch();
 
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
@@ -21,19 +21,29 @@ const Login: React.FC = () => {
 
   const [isPasswordShown, setIsPasswordShown] = useState(false);
 
-  const [formInput, setFormInput] = useState({ email: "", password: "" });
+  const [formInput, setFormInput] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
 
-  const [attemptLogin, { loading: loginLoading }] = useMutation(LOGIN, {
+  const [attemptSignUp, { loading: signUpLoading }] = useMutation(SIGNUP, {
+    variables: {
+      input: {
+        name: formInput.name,
+        email: formInput.email,
+        password: formInput.password,
+      },
+    },
     onCompleted: (data) => {
       dispatch(
         login({
-          access_token: data?.signIn?.access_token,
-          user: data?.signIn?.user,
+          access_token: data?.signUp?.access_token,
+          user: data?.signUp?.user,
         })
       );
     },
     onError: (error) => {
-      console.log(error.graphQLErrors[0]);
       Swal.fire(error?.graphQLErrors?.[0]?.message ?? "Something went wrong");
     },
   });
@@ -43,14 +53,9 @@ const Login: React.FC = () => {
 
     setIsFormSubmitted(true);
 
-    if (!clientErrors.length) {
-      attemptLogin({
-        variables: {
-          email: formInput.email,
-          password: formInput.password,
-        },
-      });
-    }
+    if (clientErrors.length) return;
+
+    attemptSignUp();
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,6 +85,18 @@ const Login: React.FC = () => {
           hello again!
         </h2>
         <p className="mb-5 text-gray-500">Welcome back to our website</p>
+
+        <TextInput
+          placeholder="Name"
+          name="name"
+          value={formInput.name}
+          onChange={handleInputChange}
+          validateAt={ValidateAt.isString}
+          isFormSubmitted={isFormSubmitted}
+          setClientErrors={setClientErrors}
+          containerStyle="w-[55%] mb-3"
+        />
+
         <TextInput
           placeholder="Email"
           name="email"
@@ -117,14 +134,14 @@ const Login: React.FC = () => {
             className="text-center bg-slate-500 text-white h-[35px] w-[100px] rounded mt-3 capitalize font-semibold"
             type="submit"
           >
-            login
+            sign up
           </button>
         </motion.div>
 
         <div className="flex items-center justify-center gap-2 mt-3">
-          <p className="font-semibold capitalize">don't have an account ?</p>
-          <NavLink to={"/signup"} className={"text-blue-500 font-semibold"}>
-            sign up
+          <p className="font-semibold capitalize">already have an account ?</p>
+          <NavLink to={"/login"} className={"text-blue-500 font-semibold"}>
+            login
           </NavLink>
         </div>
       </form>
@@ -132,4 +149,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default SignUp;

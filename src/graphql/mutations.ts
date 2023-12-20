@@ -114,3 +114,12 @@ export const CANCEL_INVITATION = gql`
     }
   }
 `;
+
+export const SIGNUP = gql`
+  mutation signUp($input: SignUpInput) {
+    signUp(input: $input) {
+      id
+      name
+    }
+  }
+`;

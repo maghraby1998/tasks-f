@@ -49,6 +49,7 @@ export const GET_TASK = gql`
 export const GET_SENT_INVITATIONS = gql`
   query getSentInviations {
     sentInvitations {
+      __typename
       id
       receiver {
         id
@@ -77,5 +78,11 @@ export const GET_RECEIVED_INVITATIONS = gql`
       }
       status
     }
+  }
+`;
+
+export const INVITATION_ACCEPTED = gql`
+  subscription invitationAccepted {
+    invitationAccepted
   }
 `;

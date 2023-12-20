@@ -14,8 +14,37 @@ import Layout from "./containers/layout";
 import CreateProject from "./containers/project/CreateProject";
 import SentInvitations from "./containers/invitations/SentInvitations";
 import ReceivedInvitations from "./containers/invitations/ReceivedInvitations";
+import SignUp from "./containers/login/SignUp";
+import { useEffect } from "react";
+import { messaging, onMessageListener } from "./firebase";
+import { getToken, onMessage } from "firebase/messaging";
 
 const App = () => {
+  useEffect(() => {
+    Notification.requestPermission().then((permission) => {
+      if (permission === "granted") {
+        console.log("permission granted");
+
+        return getToken(messaging, {
+          vapidKey:
+            "BPBcAgXkjOOC5ZDGRQHWXANsx8pi7kEgeYpORUVGkxmuG2H7MqvDFKjVbXFEeteSlS-FoECOqAiJZ1CzzNi_1M0",
+        })
+          .then((token) => {
+            console.log("get token", token);
+          })
+          .catch((err) => console.log("error", err));
+      }
+    });
+
+    const sub = onMessageListener().then((payload) => {
+      console.log("payload", payload);
+    });
+
+    return () => {
+      sub.catch((err) => console.log("err", err));
+    };
+  }, []);
+
   const token = useSelector((state: RootState) => state.auth.token);
 
   const isSideBarOpen = useSelector(
@@ -44,6 +73,7 @@ const App = () => {
         <Route path="/">
           <Route index element={<Navigate to={"/login"} />} />
           <Route path="login" element={<Login />} />
+          <Route path="signup" element={<SignUp />} />
           <Route path="*" element={<Navigate to={"/login"} />} />
         </Route>
       )

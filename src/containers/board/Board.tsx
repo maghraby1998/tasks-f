@@ -1,7 +1,12 @@
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import {
+  useLazyQuery,
+  useMutation,
+  useQuery,
+  useSubscription,
+} from "@apollo/client";
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { GET_TASK, project } from "../../graphql/queries";
+import { GET_TASK, INVITATION_ACCEPTED, project } from "../../graphql/queries";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { Alert, Box, Grow, IconButton, Snackbar } from "@mui/material";
 import {
@@ -191,6 +196,7 @@ const Board: React.FC = () => {
             {projectData?.project?.stages?.map((stage: any) => {
               return (
                 <Box
+                  key={stage?.id}
                   sx={{
                     ":hover": {
                       ".unique-icon-button-class": {
