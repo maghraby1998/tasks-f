@@ -11,6 +11,7 @@ import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 
 import { createClient } from "graphql-ws";
 import { getMainDefinition } from "@apollo/client/utilities";
+import config from "../config";
 
 const wsLink = new GraphQLWsLink(
   createClient({
@@ -29,7 +30,7 @@ const wsLink = new GraphQLWsLink(
 // * The Link to use for an operation if the function returns a "falsy" value
 
 const httpLink = createHttpLink({
-  uri: "http://localhost:5000/graphql",
+  uri: `${config.API_URI}/graphql`,
 });
 
 const splitLink = split(
