@@ -17,7 +17,7 @@ import ReceivedInvitations from "./containers/invitations/ReceivedInvitations";
 import SignUp from "./containers/login/SignUp";
 import { useEffect } from "react";
 import { messaging, onMessageListener } from "./firebase";
-import { getToken, onMessage } from "firebase/messaging";
+import { getToken } from "firebase/messaging";
 
 const App = () => {
   useEffect(() => {

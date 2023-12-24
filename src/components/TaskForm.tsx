@@ -42,41 +42,35 @@ const TaskForm: React.FC<Props> = ({
 }) => {
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
-  const [attemptUpsertTask, { loading: upsertTaskLoading }] = useMutation(
-    upsertTask,
-    {
-      variables: {
-        input: {
-          name: formData.name,
-          projectId: modalData.projectId,
-          stageId: modalData.stageId,
-          usersIds: [],
-        },
+  const [attemptUpsertTask] = useMutation(upsertTask, {
+    variables: {
+      input: {
+        name: formData.name,
+        projectId: modalData.projectId,
+        stageId: modalData.stageId,
+        usersIds: [],
       },
-      onCompleted: (_) => {
-        handleCloseModal();
-      },
-      refetchQueries: [
-        { query: project, variables: { id: modalData.projectId } },
-      ],
-    }
-  );
+    },
+    onCompleted: (_) => {
+      handleCloseModal();
+    },
+    refetchQueries: [
+      { query: project, variables: { id: modalData.projectId } },
+    ],
+  });
 
-  const [attemptUpdateTask, { loading: updateTaskLoading }] = useMutation(
-    UPDATE_TASK,
-    {
-      variables: {
-        input: {
-          id: formData?.id,
-          name: formData?.name,
-          usersIds: formData?.userIds,
-        },
+  const [attemptUpdateTask] = useMutation(UPDATE_TASK, {
+    variables: {
+      input: {
+        id: formData?.id,
+        name: formData?.name,
+        usersIds: formData?.userIds,
       },
-      onCompleted: (data) => {
-        handleCloseModal();
-      },
-    }
-  );
+    },
+    onCompleted: (_) => {
+      handleCloseModal();
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -92,7 +86,7 @@ const TaskForm: React.FC<Props> = ({
   };
 
   const handleCloseModal = () => {
-    setModalData((prev) => ({
+    setModalData((_) => ({
       isOpen: false,
       projectId: null,
       stageId: null,

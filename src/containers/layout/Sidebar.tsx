@@ -21,7 +21,7 @@ const Sidebar = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { loading: projectsLoading, data: projectsData } = useQuery(projects, {
+  const { data: projectsData } = useQuery(projects, {
     fetchPolicy: "cache-and-network",
   });
 

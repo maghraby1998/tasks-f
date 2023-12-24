@@ -1,6 +1,6 @@
 import { CircularProgress, Modal } from "@mui/material";
 import React from "react";
-import ModalSize from "../enums/ModalSize";
+// import ModalSize from "../enums/ModalSize";
 
 interface Props {
   isOpen: boolean;

@@ -5,13 +5,11 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { NavLink, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import {
@@ -41,8 +39,8 @@ const theme = createTheme({
 });
 
 // const pages = [{ name: "board", to: "/" }];
-const pages = [{}];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+// const pages = [{}];
+// const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 const Layout = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -57,7 +55,7 @@ const Layout = () => {
     null
   );
 
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+  const handleOpenNavMenu = () => {
     dispatch(toggleSideBar(!isSideBarOpen));
   };
 

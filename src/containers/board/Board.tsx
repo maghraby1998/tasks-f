@@ -1,12 +1,7 @@
-import {
-  useLazyQuery,
-  useMutation,
-  useQuery,
-  useSubscription,
-} from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { GET_TASK, INVITATION_ACCEPTED, project } from "../../graphql/queries";
+import { GET_TASK, project } from "../../graphql/queries";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { Alert, Box, Grow, IconButton, Snackbar } from "@mui/material";
 import {
@@ -59,20 +54,19 @@ const Board: React.FC = () => {
     setCollapsedStages((prev) => prev.filter((id) => id !== stageId));
   };
 
-  const { loading: projectLoading, data: projectData } = useQuery(project, {
+  const { data: projectData } = useQuery(project, {
     fetchPolicy: "network-only",
     variables: {
       id,
     },
   });
 
-  const [attemptUpdateTaskStage, { loading: updateTaskStageLoading }] =
-    useMutation(updateTaskStage, {
-      onCompleted: (data) => {
-        setIsSnackBarOpen(true);
-      },
-      refetchQueries: [{ query: project, variables: { id } }],
-    });
+  const [attemptUpdateTaskStage] = useMutation(updateTaskStage, {
+    onCompleted: (_) => {
+      setIsSnackBarOpen(true);
+    },
+    refetchQueries: [{ query: project, variables: { id } }],
+  });
 
   const handleDrop = (droppedItem: any) => {
     setIsDraggingMode(false);
@@ -112,7 +106,7 @@ const Board: React.FC = () => {
 
   const [isMouseDown, setIsMouseDown] = useState(false);
 
-  const handleMouseDown = (e: any) => {
+  const handleMouseDown = (_: never) => {
     if (!ourRef.current || isDraggingMode) return;
     const slider = ourRef.current;
     setIsMouseDown(true);
@@ -127,7 +121,7 @@ const Board: React.FC = () => {
     slider.style.cursor = "grab";
   };
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!isMouseDown || !ourRef.current || isDraggingMode) return;
     e.preventDefault();
     const slider = ourRef.current;
@@ -135,10 +129,9 @@ const Board: React.FC = () => {
       e?.movementX > 0 ? slider.scrollLeft - 12 : slider.scrollLeft + 12;
   };
 
-  const [attemptGetTask, { loading: getTaskLoading }] = useLazyQuery(GET_TASK, {
+  const [attemptGetTask] = useLazyQuery(GET_TASK, {
     onCompleted: (data) => {
-      console.log(data);
-      const { id, name, users } = data?.task ?? {};
+      const { id, name } = data?.task ?? {};
       setTaskModalData({ isOpen: true });
       setTaskFormData({ id, name, userIds: [] });
     },
@@ -246,33 +239,35 @@ const Board: React.FC = () => {
                               </div>
 
                               <div className="overflow-auto h-[calc(100vh-180px)]">
-                                {stage?.tasks?.map((task, index) => (
-                                  <>
-                                    <Draggable
-                                      key={task?.id}
-                                      draggableId={task?.id?.toString()}
-                                      index={index}
-                                    >
-                                      {(provideddd) => {
-                                        return (
-                                          <div
-                                            onClick={() =>
-                                              handleEditTask(task?.id)
-                                            }
-                                            className="bg-gray-400/20 p-2 my-2 min-h-[100px] rounded-sm"
-                                            ref={provideddd.innerRef}
-                                            {...provideddd.dragHandleProps}
-                                            {...provideddd.draggableProps}
-                                          >
-                                            <p className="text-sm capitalize">
-                                              {task?.name}
-                                            </p>
-                                          </div>
-                                        );
-                                      }}
-                                    </Draggable>
-                                  </>
-                                ))}
+                                {stage?.tasks?.map(
+                                  (task: any, index: number) => (
+                                    <>
+                                      <Draggable
+                                        key={task?.id}
+                                        draggableId={task?.id?.toString()}
+                                        index={index}
+                                      >
+                                        {(provideddd) => {
+                                          return (
+                                            <div
+                                              onClick={() =>
+                                                handleEditTask(task?.id)
+                                              }
+                                              className="bg-gray-400/20 p-2 my-2 min-h-[100px] rounded-sm"
+                                              ref={provideddd.innerRef}
+                                              {...provideddd.dragHandleProps}
+                                              {...provideddd.draggableProps}
+                                            >
+                                              <p className="text-sm capitalize">
+                                                {task?.name}
+                                              </p>
+                                            </div>
+                                          );
+                                        }}
+                                      </Draggable>
+                                    </>
+                                  )
+                                )}
                                 <IconButton
                                   sx={{
                                     borderRadius: "4px",

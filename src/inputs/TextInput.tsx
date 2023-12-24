@@ -1,6 +1,5 @@
 import React from "react";
 import ValidateAt from "../enums/ValidateAt";
-import InputWithValidation from "./InputWithValidation";
 import {
   FilledInputProps,
   OutlinedInputProps,
@@ -32,8 +31,6 @@ interface Props {
   className?: string;
   inputVariant?: TextFieldVariants | undefined;
 }
-
-const randomId = String(Math.random() * 999999999);
 
 const TextInput: React.FC<Props> = ({
   onChange,
@@ -77,6 +74,7 @@ const TextInput: React.FC<Props> = ({
         disabled={disabled}
         error={!isValid && props.isFormSubmitted}
         type={type}
+        // @ts-ignore
         InputProps={InputProps}
       />
 

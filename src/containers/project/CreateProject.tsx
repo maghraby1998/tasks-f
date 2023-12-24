@@ -3,7 +3,6 @@ import TextInput from "../../inputs/TextInput";
 import ValidateAt from "../../enums/ValidateAt";
 import Stages from "./Stages";
 import { Alert, IconButton, Snackbar } from "@mui/material";
-import { Save } from "@mui/icons-material";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { updateProject, upsertProject } from "../../graphql/mutations";
 import { project, projects } from "../../graphql/queries";
@@ -11,10 +10,10 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 // import Members from "./Members";
 
-interface Stage {
-  name: string;
-  order: number;
-}
+// interface Stage {
+//   name: string;
+//   order: number;
+// }
 
 interface FormData {
   id?: number | null;
@@ -36,18 +35,23 @@ const CreateProject = () => {
   const [clientErrors, setClientErrors] = useState([]);
   const [isSnackBarOpen, setIsSnackBarOpen] = useState(false);
 
-  const [attemptFetchProject, { loading: fetchProjectLoading }] = useLazyQuery(
-    project,
-    {
-      variables: { id },
-      onCompleted: (data) => {
-        const { id, name, stages } = data?.project ?? {};
+  const [attemptFetchProject] = useLazyQuery(project, {
+    variables: { id },
+    onCompleted: (data) => {
+      const { id, name, stages } = data?.project ?? {};
 
-        setFormData({ id, name });
-        setStages(stages?.map(({ id, name, order }) => ({ id, name, order })));
-      },
-    }
-  );
+      setFormData({ id, name });
+      setStages(
+        stages?.map(
+          ({ id, name, order }: { id: any; name: any; order: any }) => ({
+            id,
+            name,
+            order,
+          })
+        )
+      );
+    },
+  });
 
   useEffect(() => {
     if (id) {
@@ -55,31 +59,25 @@ const CreateProject = () => {
     }
   }, []);
 
-  const [attemptUpsertProject, { loading: upsertProjectLoading }] = useMutation(
-    upsertProject,
-    {
-      variables: {
-        input: { name: formData.name, stages },
-      },
-      onCompleted: (data) => {
-        navigate(`/board/${data?.upsertProject?.id}`);
-      },
-      refetchQueries: [{ query: projects }],
-    }
-  );
+  const [attemptUpsertProject] = useMutation(upsertProject, {
+    variables: {
+      input: { name: formData.name, stages },
+    },
+    onCompleted: (data) => {
+      navigate(`/board/${data?.upsertProject?.id}`);
+    },
+    refetchQueries: [{ query: projects }],
+  });
 
-  const [attemptUpdateProject, { loading: updateProjectLoading }] = useMutation(
-    updateProject,
-    {
-      variables: {
-        input: { id: formData?.id, name: formData.name, stages },
-      },
-      onCompleted: (data) => {
-        navigate(`/board/${data?.updateProject?.id}`);
-      },
-      refetchQueries: [{ query: projects }],
-    }
-  );
+  const [attemptUpdateProject] = useMutation(updateProject, {
+    variables: {
+      input: { id: formData?.id, name: formData.name, stages },
+    },
+    onCompleted: (data) => {
+      navigate(`/board/${data?.updateProject?.id}`);
+    },
+    refetchQueries: [{ query: projects }],
+  });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

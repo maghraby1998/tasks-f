@@ -1,7 +1,7 @@
 import React from "react";
 import InvitationStatus from "../../enums/InvitationStatus";
 import { IconButton } from "@mui/material";
-import { Block, Check, Close, ThumbsUpDown } from "@mui/icons-material";
+import { Block, Check, Close } from "@mui/icons-material";
 import {
   ACCEPT_INVITATION,
   CANCEL_INVITATION,

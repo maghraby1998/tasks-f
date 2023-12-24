@@ -4,7 +4,7 @@ import InvitationCard from "./InvitationCard";
 import { INVITATION_ACCEPTED } from "../../graphql/queries";
 
 const ReceivedInvitations = () => {
-  const { data, loading } = useQuery(GET_RECEIVED_INVITATIONS, {
+  const { data } = useQuery(GET_RECEIVED_INVITATIONS, {
     fetchPolicy: "cache-and-network",
   });
 

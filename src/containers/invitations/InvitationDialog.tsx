@@ -24,7 +24,7 @@ const InvitationDialog: React.FC<Props> = ({ open, onClose, projectId }) => {
       variables: {
         input: { email, projectId },
       },
-      onError: (error) => {
+      onError: (_) => {
         setErrorShown(true);
       },
     }

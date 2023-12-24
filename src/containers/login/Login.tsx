@@ -10,8 +10,9 @@ import { useMutation } from "@apollo/client";
 import { LOGIN } from "../../graphql/mutations";
 import Swal from "sweetalert2";
 import { IconButton, InputAdornment } from "@mui/material";
-import { AccountCircle, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { NavLink } from "react-router-dom";
+import loginImage from "../../assets/login-background.jpg";
 
 const Login: React.FC = () => {
   const dispatch = useDispatch();
@@ -23,7 +24,7 @@ const Login: React.FC = () => {
 
   const [formInput, setFormInput] = useState({ email: "", password: "" });
 
-  const [attemptLogin, { loading: loginLoading }] = useMutation(LOGIN, {
+  const [attemptLogin] = useMutation(LOGIN, {
     onCompleted: (data) => {
       dispatch(
         login({
@@ -61,11 +62,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="flex items-center min-h-screen">
-      <img
-        src="/src/assets/login-background.jpg"
-        className="w-full"
-        alt="login-image"
-      />
+      <img src={loginImage} className="w-full" alt="login-image" />
       <div className="h-[calc(70vh)] w-[2px] bg-slate-800"></div>
       <form
         onSubmit={handleSubmit}

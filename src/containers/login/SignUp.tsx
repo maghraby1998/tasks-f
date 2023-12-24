@@ -7,10 +7,10 @@ import { motion } from "framer-motion";
 import TextInput from "../../inputs/TextInput";
 import ValidateAt from "../../enums/ValidateAt";
 import { useMutation } from "@apollo/client";
-import { LOGIN, SIGNUP } from "../../graphql/mutations";
+import { SIGNUP } from "../../graphql/mutations";
 import Swal from "sweetalert2";
 import { IconButton, InputAdornment } from "@mui/material";
-import { AccountCircle, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { NavLink } from "react-router-dom";
 
 const SignUp: React.FC = () => {
@@ -27,7 +27,7 @@ const SignUp: React.FC = () => {
     password: "",
   });
 
-  const [attemptSignUp, { loading: signUpLoading }] = useMutation(SIGNUP, {
+  const [attemptSignUp] = useMutation(SIGNUP, {
     variables: {
       input: {
         name: formInput.name,
