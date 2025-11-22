@@ -67,7 +67,7 @@ const TaskForm: React.FC<Props> = ({
         usersIds: formData?.userIds,
       },
     },
-    onCompleted: (_) => {
+    onCompleted: () => {
       handleCloseModal();
     },
   });
@@ -100,6 +100,7 @@ const TaskForm: React.FC<Props> = ({
       isOpen={modalData.isOpen}
       modalTitle="Task"
       onClose={handleCloseModal}
+      disableBackdropClick={false}
     >
       <form className="flex flex-col" onSubmit={handleSubmit}>
         <TextInput

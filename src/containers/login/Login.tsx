@@ -62,11 +62,14 @@ const Login: React.FC = () => {
 
   return (
     <div className="flex items-center min-h-screen">
+      <div className="flex-1">
+
       <img src={loginImage} className="w-full" alt="login-image" />
+      </div>
       <div className="h-[calc(70vh)] w-[2px] bg-slate-800"></div>
       <form
         onSubmit={handleSubmit}
-        className="w-full flex flex-col items-center"
+        className="flex-1 flex flex-col items-center"
       >
         <FontAwesomeIcon
           icon={faListCheck}

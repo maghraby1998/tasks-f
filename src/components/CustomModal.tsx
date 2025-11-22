@@ -12,6 +12,7 @@ interface Props {
   saveBtnFunction?: (e?: any) => void;
   saveBtnLoading?: boolean;
   saveBtnStyle?: string;
+  disableBackdropClick: boolean
 }
 
 const CustomModal: React.FC<Props> = ({
@@ -24,28 +25,35 @@ const CustomModal: React.FC<Props> = ({
   saveBtnFunction = () => {},
   saveBtnLoading = false,
   saveBtnStyle = "bg-secondary-color",
+  disableBackdropClick = true
 }) => {
   return (
     <Modal
       open={isOpen}
       className={`custom-modal-style`}
       sx={{ width: `${modalSize}px` }}
-      disableEscapeKeyDown
+      // disableEscapeKeyDown
       slotProps={{
         backdrop: {
           onClick: () => {},
         },
       }}
+      onBackdropClick={disableBackdropClick ? undefined : onClose}
+      BackdropProps={{
+        style: {
+          cursor: disableBackdropClick ? undefined:  "pointer"
+        }
+      }}
     >
       <div className="rounded">
         <div className="h-[40px] bg-primary-color w-full capitalize flex justify-between items-center text-white font-bold">
           <p className="px-5">{modalTitle}</p>
-          <button
+         {disableBackdropClick ?  <button
             className="bg-red-600 text-white text-xl font-bold h-full w-[50px]"
             onClick={onClose}
           >
             x
-          </button>
+          </button> : null}
         </div>
         <div className="bg-white px-5 py-5 rounded-bl rounded-br">
           {children}

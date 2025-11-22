@@ -42,6 +42,12 @@ export const GET_TASK = gql`
         id
         name
       }
+      project {
+        users {
+          id
+          name
+        }
+      }
     }
   }
 `;
