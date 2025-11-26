@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import CustomModal from "./CustomModal";
 import TextInput from "../inputs/TextInput";
 import ValidateAt from "../enums/ValidateAt";
-import { IconButton } from "@mui/material";
+import { IconButton, TextareaAutosize, TextField } from "@mui/material";
 import { useMutation } from "@apollo/client";
 import { UPDATE_TASK, upsertTask } from "../graphql/mutations";
 import { project } from "../graphql/queries";
+import { useFormik } from "formik";
 
 interface Props {
   modalData: {
@@ -32,6 +33,11 @@ interface Props {
   setClientErrors: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
+interface Values {
+  name: string;
+  description: string;
+}
+
 const TaskForm: React.FC<Props> = ({
   modalData,
   setModalData,
@@ -40,6 +46,18 @@ const TaskForm: React.FC<Props> = ({
   clientErrors,
   setClientErrors,
 }) => {
+  const { handleSubmit, errors, values, handleChange } = useFormik({
+    initialValues: {
+      name: "",
+      description: "",
+    },
+    onSubmit: (values: Values) => {
+      console.log("values", values);
+    },
+  });
+
+  console.log("errors", errors);
+
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
   const [attemptUpsertTask] = useMutation(upsertTask, {
@@ -72,18 +90,18 @@ const TaskForm: React.FC<Props> = ({
     },
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsFormSubmitted(true);
+  // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   setIsFormSubmitted(true);
 
-    if (clientErrors.length) return;
+  //   if (clientErrors.length) return;
 
-    if (formData?.id) {
-      attemptUpdateTask();
-    } else {
-      attemptUpsertTask();
-    }
-  };
+  //   if (formData?.id) {
+  //     attemptUpdateTask();
+  //   } else {
+  //     attemptUpsertTask();
+  //   }
+  // };
 
   const handleCloseModal = () => {
     setModalData((_) => ({
@@ -103,15 +121,20 @@ const TaskForm: React.FC<Props> = ({
       disableBackdropClick={false}
     >
       <form className="flex flex-col" onSubmit={handleSubmit}>
-        <TextInput
-          name="name"
-          value={formData.name}
-          setFormData={setFormData}
-          placeholder="Name"
-          isFormSubmitted={isFormSubmitted}
-          validateAt={ValidateAt.isString}
-          autoFocus
-          setClientErrors={setClientErrors}
+        <TextField
+          label="name"
+          variant="outlined"
+          name={"name"}
+          value={values.name}
+          onChange={handleChange}
+          type="text"
+        />
+
+        <TextareaAutosize
+          onChange={handleChange}
+          value={values.description}
+          minRows={5}
+          inputMode="text"
         />
 
         <IconButton
