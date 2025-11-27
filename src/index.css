@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.test-style {
+    border-color: blue !important;
+    border-width: 10px !important;
+}

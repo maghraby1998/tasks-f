@@ -2,11 +2,22 @@ import React, { useState } from "react";
 import CustomModal from "./CustomModal";
 import TextInput from "../inputs/TextInput";
 import ValidateAt from "../enums/ValidateAt";
-import { IconButton, TextareaAutosize, TextField } from "@mui/material";
-import { useMutation } from "@apollo/client";
+import {
+  createTheme,
+  IconButton,
+  Input,
+  TextareaAutosize,
+  TextField,
+  Theme,
+  Popover,
+  Menu,
+  MenuItem,
+} from "@mui/material";
+import { useMutation, useQuery } from "@apollo/client";
 import { UPDATE_TASK, upsertTask } from "../graphql/mutations";
-import { project } from "../graphql/queries";
+import { GET_PROJECT_USERS, project } from "../graphql/queries";
 import { useFormik } from "formik";
+import { Add, PlusOne } from "@mui/icons-material";
 
 interface Props {
   modalData: {
@@ -36,6 +47,7 @@ interface Props {
 interface Values {
   name: string;
   description: string;
+  userIds: number[];
 }
 
 const TaskForm: React.FC<Props> = ({
@@ -46,17 +58,25 @@ const TaskForm: React.FC<Props> = ({
   clientErrors,
   setClientErrors,
 }) => {
-  const { handleSubmit, errors, values, handleChange } = useFormik({
+  const { handleSubmit, errors, values, handleChange, setValues } = useFormik({
     initialValues: {
       name: "",
       description: "",
+      userIds: [],
     },
     onSubmit: (values: Values) => {
       console.log("values", values);
     },
   });
 
-  console.log("errors", errors);
+  console.log("modalData", modalData);
+
+  const { data } = useQuery(GET_PROJECT_USERS, {
+    skip: !modalData?.projectId,
+    variables: {
+      projectId: modalData?.projectId,
+    },
+  });
 
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
@@ -113,6 +133,32 @@ const TaskForm: React.FC<Props> = ({
     setFormData({ name: "", userIds: [] });
   };
 
+  const [anchorEl, setAnchorEl] = useState<any>(null);
+
+  const handleAddAssignees = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handleAddOrRemoveUser = (userId: number) => {
+    if (values.userIds.includes(userId)) {
+      setValues((prev: any) => ({
+        ...prev,
+        userIds: prev.userIds.filter((id: any) => id != userId),
+      }));
+    } else {
+      setValues((prev: any) => ({
+        ...prev,
+        userIds: [...prev.userIds, userId],
+      }));
+    }
+  };
+
+  const handleRemoveAssignee = (userId: number) => {
+    setValues((prev) => ({
+      ...prev,
+      userIds: prev.userIds.filter((id) => id != userId),
+    }));
+  };
   return (
     <CustomModal
       isOpen={modalData.isOpen}
@@ -128,14 +174,72 @@ const TaskForm: React.FC<Props> = ({
           value={values.name}
           onChange={handleChange}
           type="text"
+          margin="normal"
         />
 
-        <TextareaAutosize
-          onChange={handleChange}
+        <TextField
+          multiline
+          rows={5}
+          label="description"
+          variant="outlined"
+          name={"description"}
           value={values.description}
-          minRows={5}
-          inputMode="text"
+          onChange={handleChange}
+          type="text"
+          margin="normal"
         />
+
+        <div className="flex items-center gap-5">
+          <p>assign to</p>
+          <div className="border flex items-center gap-2 px-2 rounded-md">
+            <div className="flex items-center gap-1">
+              {data?.project?.users
+                ?.filter((user: any) => values.userIds.includes(+user.id))
+                .map((user: any) => (
+                  <IconButton
+                    key={user.id}
+                    className="w-[25px] h-[25px] bg-gray-500 text-white rounded-full flex items-center justify-center m-1 text-[10px] capitalize"
+                    onClick={() => handleRemoveAssignee(user?.id)}
+                    style={{
+                      backgroundColor: "grey",
+                      color: "white",
+                      fontSize: 15,
+                    }}
+                  >
+                    {user.name?.[0]}
+                  </IconButton>
+                ))}
+            </div>
+
+            <IconButton onClick={handleAddAssignees}>
+              <Add />
+            </IconButton>
+          </div>
+        </div>
+
+        <Menu
+          open={!!anchorEl}
+          anchorEl={anchorEl}
+          onClose={() => {
+            setAnchorEl(null);
+          }}
+          MenuListProps={{
+            style: {
+              width: 200,
+            },
+          }}
+        >
+          {data?.project?.users
+            ?.filter((user: any) => !values.userIds.includes(+user?.id))
+            ?.map((user: any) => (
+              <MenuItem
+                onClick={() => handleAddOrRemoveUser(+user.id)}
+                key={user.id}
+              >
+                {user.name}
+              </MenuItem>
+            ))}
+        </Menu>
 
         <IconButton
           type="submit"

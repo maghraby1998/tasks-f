@@ -132,7 +132,7 @@ const Board: React.FC = () => {
   const [attemptGetTask] = useLazyQuery(GET_TASK, {
     onCompleted: (data) => {
       const { id, name } = data?.task ?? {};
-      setTaskModalData({ isOpen: true });
+      setTaskModalData({ isOpen: true, projectId: id ? +id : null });
       setTaskFormData({ id, name, userIds: [] });
     },
   });

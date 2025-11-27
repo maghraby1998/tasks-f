@@ -92,3 +92,14 @@ export const INVITATION_ACCEPTED = gql`
     invitationAccepted
   }
 `;
+
+export const GET_PROJECT_USERS = gql`
+  query GetProjectUsers($projectId: ID!) {
+    project(id: $projectId) {
+      users {
+        id
+        name
+      }
+    }
+  }
+`;
