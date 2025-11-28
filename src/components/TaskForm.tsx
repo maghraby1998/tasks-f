@@ -12,18 +12,27 @@ import {
   Popover,
   Menu,
   MenuItem,
+  Tooltip,
 } from "@mui/material";
 import { useMutation, useQuery } from "@apollo/client";
 import { UPDATE_TASK, upsertTask } from "../graphql/mutations";
-import { GET_PROJECT_USERS, project } from "../graphql/queries";
+import { GET_PROJECT_USERS, GET_TASK, project } from "../graphql/queries";
 import { useFormik } from "formik";
 import { Add, PlusOne } from "@mui/icons-material";
+import * as Yup from "yup";
+
+const CreateTaskSchema = Yup.object().shape({
+  name: Yup.string().required("Task name is required"),
+  description: Yup.string().required("Description is required"),
+  userIds: Yup.array().of(Yup.number()),
+});
 
 interface Props {
   modalData: {
     isOpen: boolean;
     projectId?: number | null;
     stageId?: number | null;
+    taskId?: number | null;
   };
   setModalData: React.Dispatch<
     React.SetStateAction<{
@@ -32,44 +41,38 @@ interface Props {
       stageId?: number | null;
     }>
   >;
-  formData: { id?: number | null; name: string; userIds: string[] };
-  setFormData: React.Dispatch<
-    React.SetStateAction<{
-      id?: number | null;
-      name: string;
-      userIds: string[];
-    }>
-  >;
-  clientErrors: string[];
-  setClientErrors: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 interface Values {
+  id?: number;
   name: string;
   description: string;
   userIds: number[];
 }
 
-const TaskForm: React.FC<Props> = ({
-  modalData,
-  setModalData,
-  formData,
-  setFormData,
-  clientErrors,
-  setClientErrors,
-}) => {
-  const { handleSubmit, errors, values, handleChange, setValues } = useFormik({
-    initialValues: {
-      name: "",
-      description: "",
-      userIds: [],
-    },
-    onSubmit: (values: Values) => {
-      console.log("values", values);
-    },
-  });
-
-  console.log("modalData", modalData);
+const TaskForm: React.FC<Props> = ({ modalData, setModalData }) => {
+  const { handleSubmit, errors, values, handleChange, setValues, touched } =
+    useFormik({
+      initialValues: {
+        name: "",
+        description: "",
+        userIds: [],
+      },
+      validationSchema: CreateTaskSchema,
+      onSubmit: (values: Values) => {
+        attemptUpsertTask({
+          variables: {
+            input: {
+              name: values?.name,
+              projectId: modalData?.projectId,
+              stageId: modalData?.stageId,
+              description: values?.description,
+              usersIds: values?.userIds ?? [],
+            },
+          },
+        });
+      },
+    });
 
   const { data } = useQuery(GET_PROJECT_USERS, {
     skip: !modalData?.projectId,
@@ -78,18 +81,25 @@ const TaskForm: React.FC<Props> = ({
     },
   });
 
-  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const { loading } = useQuery(GET_TASK, {
+    variables: {
+      id: modalData?.taskId,
+    },
+    skip: !modalData?.taskId,
+    onCompleted: (data) => {
+      const { id, name, assignees } = data?.task ?? {};
+
+      setValues({
+        id,
+        name,
+        description: data?.task?.description || "",
+        userIds: assignees?.map((assignee: any) => assignee?.id) || [],
+      });
+    },
+  });
 
   const [attemptUpsertTask] = useMutation(upsertTask, {
-    variables: {
-      input: {
-        name: formData.name,
-        projectId: modalData.projectId,
-        stageId: modalData.stageId,
-        usersIds: [],
-      },
-    },
-    onCompleted: (_) => {
+    onCompleted: () => {
       handleCloseModal();
     },
     refetchQueries: [
@@ -97,18 +107,18 @@ const TaskForm: React.FC<Props> = ({
     ],
   });
 
-  const [attemptUpdateTask] = useMutation(UPDATE_TASK, {
-    variables: {
-      input: {
-        id: formData?.id,
-        name: formData?.name,
-        usersIds: formData?.userIds,
-      },
-    },
-    onCompleted: () => {
-      handleCloseModal();
-    },
-  });
+  // const [attemptUpdateTask] = useMutation(UPDATE_TASK, {
+  //   variables: {
+  //     input: {
+  //       id: formData?.id,
+  //       name: formData?.name,
+  //       usersIds: formData?.userIds,
+  //     },
+  //   },
+  //   onCompleted: () => {
+  //     handleCloseModal();
+  //   },
+  // });
 
   // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   //   e.preventDefault();
@@ -129,8 +139,6 @@ const TaskForm: React.FC<Props> = ({
       projectId: null,
       stageId: null,
     }));
-
-    setFormData({ name: "", userIds: [] });
   };
 
   const [anchorEl, setAnchorEl] = useState<any>(null);
@@ -140,7 +148,7 @@ const TaskForm: React.FC<Props> = ({
   };
 
   const handleAddOrRemoveUser = (userId: number) => {
-    if (values.userIds.includes(userId)) {
+    if (values.userIds?.map(Number).includes(+userId)) {
       setValues((prev: any) => ({
         ...prev,
         userIds: prev.userIds.filter((id: any) => id != userId),
@@ -159,6 +167,17 @@ const TaskForm: React.FC<Props> = ({
       userIds: prev.userIds.filter((id) => id != userId),
     }));
   };
+
+  const selectedUsers = data?.project?.users?.filter((user: any) =>
+    values.userIds?.map(Number).includes(+user?.id)
+  );
+
+  const availableAssignees = data?.project?.users?.filter(
+    (user: any) => !values.userIds?.map(Number).includes(+user?.id)
+  );
+
+  console.log("ss", values, data?.project?.users);
+
   return (
     <CustomModal
       isOpen={modalData.isOpen}
@@ -175,6 +194,9 @@ const TaskForm: React.FC<Props> = ({
           onChange={handleChange}
           type="text"
           margin="normal"
+          className="capitalize"
+          error={!!(errors?.name && touched?.name)}
+          helperText={touched?.name && errors?.name}
         />
 
         <TextField
@@ -187,15 +209,17 @@ const TaskForm: React.FC<Props> = ({
           onChange={handleChange}
           type="text"
           margin="normal"
+          className="capitalize"
+          error={!!(errors?.description && touched?.description)}
+          helperText={touched?.description && errors?.description}
         />
 
         <div className="flex items-center gap-5">
           <p>assign to</p>
           <div className="border flex items-center gap-2 px-2 rounded-md">
             <div className="flex items-center gap-1">
-              {data?.project?.users
-                ?.filter((user: any) => values.userIds.includes(+user.id))
-                .map((user: any) => (
+              {selectedUsers?.map((user: any) => (
+                <Tooltip title={user?.name} key={user?.id}>
                   <IconButton
                     key={user.id}
                     className="w-[25px] h-[25px] bg-gray-500 text-white rounded-full flex items-center justify-center m-1 text-[10px] capitalize"
@@ -208,7 +232,8 @@ const TaskForm: React.FC<Props> = ({
                   >
                     {user.name?.[0]}
                   </IconButton>
-                ))}
+                </Tooltip>
+              ))}
             </div>
 
             <IconButton onClick={handleAddAssignees}>
@@ -229,16 +254,26 @@ const TaskForm: React.FC<Props> = ({
             },
           }}
         >
-          {data?.project?.users
-            ?.filter((user: any) => !values.userIds.includes(+user?.id))
-            ?.map((user: any) => (
-              <MenuItem
-                onClick={() => handleAddOrRemoveUser(+user.id)}
+          {availableAssignees?.map((user: any) => (
+            <MenuItem
+              onClick={() => handleAddOrRemoveUser(+user.id)}
+              key={user.id}
+            >
+              <span
                 key={user.id}
+                className="w-[25px] h-[25px] bg-gray-500 text-white rounded-full flex items-center justify-center me-3 text-[10px] capitalize"
+                onClick={() => handleRemoveAssignee(user?.id)}
+                style={{
+                  backgroundColor: "grey",
+                  color: "white",
+                  fontSize: 15,
+                }}
               >
-                {user.name}
-              </MenuItem>
-            ))}
+                {user.name?.[0]}
+              </span>
+              {user.name}
+            </MenuItem>
+          ))}
         </Menu>
 
         <IconButton

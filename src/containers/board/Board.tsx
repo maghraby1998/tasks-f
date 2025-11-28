@@ -15,6 +15,7 @@ import TaskForm from "../../components/TaskForm";
 import { updateTaskStage } from "../../graphql/mutations";
 import { useNavigate } from "react-router-dom";
 import InvitationDialog from "../invitations/InvitationDialog";
+import TaskCard from "../../components/TaskCard";
 
 const Board: React.FC = () => {
   const { id } = useParams();
@@ -28,17 +29,12 @@ const Board: React.FC = () => {
     isOpen: boolean;
     projectId?: number | null;
     stageId?: number | null;
+    taskId?: number | null;
   }>({
     isOpen: false,
     projectId: null,
     stageId: null,
   });
-
-  const [taskFormData, setTaskFormData] = useState<{
-    id?: number | null;
-    name: string;
-    userIds: string[];
-  }>({ name: "", userIds: [] });
 
   const [taskFormClientErrors, setTaskFormClientErrors] = useState<string[]>(
     []
@@ -129,20 +125,8 @@ const Board: React.FC = () => {
       e?.movementX > 0 ? slider.scrollLeft - 12 : slider.scrollLeft + 12;
   };
 
-  const [attemptGetTask] = useLazyQuery(GET_TASK, {
-    onCompleted: (data) => {
-      const { id, name } = data?.task ?? {};
-      setTaskModalData({ isOpen: true, projectId: id ? +id : null });
-      setTaskFormData({ id, name, userIds: [] });
-    },
-  });
-
-  const handleEditTask = (id: number) => {
-    attemptGetTask({
-      variables: {
-        id,
-      },
-    });
+  const handleEditTask = (taskId: number) => {
+    setTaskModalData({ isOpen: true, projectId: id ? +id : null, taskId });
   };
 
   const handleEditProject = () => {
@@ -253,14 +237,11 @@ const Board: React.FC = () => {
                                               onClick={() =>
                                                 handleEditTask(task?.id)
                                               }
-                                              className="bg-gray-400/20 p-2 my-2 min-h-[100px] rounded-sm"
                                               ref={provideddd.innerRef}
                                               {...provideddd.dragHandleProps}
                                               {...provideddd.draggableProps}
                                             >
-                                              <p className="text-sm capitalize">
-                                                {task?.name}
-                                              </p>
+                                              <TaskCard task={task} />
                                             </div>
                                           );
                                         }}
@@ -319,14 +300,7 @@ const Board: React.FC = () => {
           </DragDropContext>
         </div>
         {taskModalData.isOpen ? (
-          <TaskForm
-            modalData={taskModalData}
-            setModalData={setTaskModalData}
-            formData={taskFormData}
-            setFormData={setTaskFormData}
-            clientErrors={taskFormClientErrors}
-            setClientErrors={setTaskFormClientErrors}
-          />
+          <TaskForm modalData={taskModalData} setModalData={setTaskModalData} />
         ) : null}
 
         <Snackbar
