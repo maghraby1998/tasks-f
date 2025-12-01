@@ -43,9 +43,7 @@ export const GET_TASK = gql`
       name
       description
       assignees {
-        __typename
         id
-        name
       }
       project {
         users {

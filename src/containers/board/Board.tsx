@@ -16,6 +16,7 @@ import { updateTaskStage } from "../../graphql/mutations";
 import { useNavigate } from "react-router-dom";
 import InvitationDialog from "../invitations/InvitationDialog";
 import TaskCard from "../../components/TaskCard";
+import TaskManagementForm from "../../components/TaskManagementForm";
 
 const Board: React.FC = () => {
   const { id } = useParams();
@@ -34,6 +35,16 @@ const Board: React.FC = () => {
     isOpen: false,
     projectId: null,
     stageId: null,
+  });
+
+  const [editTaskModalData, setEditTaskModalData] = useState<{
+    isOpen: boolean;
+    taskId?: number | null;
+    projectId?: number | null;
+  }>({
+    isOpen: false,
+    taskId: null,
+    projectId: null,
   });
 
   const [taskFormClientErrors, setTaskFormClientErrors] = useState<string[]>(
@@ -126,7 +137,7 @@ const Board: React.FC = () => {
   };
 
   const handleEditTask = (taskId: number) => {
-    setTaskModalData({ isOpen: true, projectId: id ? +id : null, taskId });
+    setEditTaskModalData({ isOpen: true, taskId, projectId: id ? +id : null });
   };
 
   const handleEditProject = () => {
@@ -301,6 +312,13 @@ const Board: React.FC = () => {
         </div>
         {taskModalData.isOpen ? (
           <TaskForm modalData={taskModalData} setModalData={setTaskModalData} />
+        ) : null}
+
+        {editTaskModalData.isOpen ? (
+          <TaskManagementForm
+            modalData={editTaskModalData}
+            setModalData={setEditTaskModalData}
+          />
         ) : null}
 
         <Snackbar
