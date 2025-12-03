@@ -8,6 +8,7 @@ import { updateProject, upsertProject } from "../../graphql/mutations";
 import { project, projects } from "../../graphql/queries";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 // import Members from "./Members";
 
 // interface Stage {
@@ -65,6 +66,13 @@ const CreateProject = () => {
     },
     onCompleted: (data) => {
       navigate(`/board/${data?.upsertProject?.id}`);
+    },
+    onError: (err) => {
+      console.log("err", err?.graphQLErrors?.[0]?.message);
+      Swal.fire({
+        icon: "error",
+        text: err?.graphQLErrors?.[0]?.message || "Something went wrong!",
+      });
     },
     refetchQueries: [{ query: projects }],
   });
