@@ -13,11 +13,18 @@ import {
   MenuItem,
   Tooltip,
 } from "@mui/material";
-import { useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { UPDATE_TASK, upsertTask } from "../graphql/mutations";
 import { GET_PROJECT_USERS, GET_TASK, project } from "../graphql/queries";
 import { useFormik } from "formik";
-import { Add, AddCircle, Cancel, Close, PlusOne } from "@mui/icons-material";
+import {
+  Add,
+  AddCircle,
+  Cancel,
+  Check,
+  Close,
+  PlusOne,
+} from "@mui/icons-material";
 import * as Yup from "yup";
 
 const CreateTaskSchema = Yup.object().shape({
@@ -25,6 +32,26 @@ const CreateTaskSchema = Yup.object().shape({
   description: Yup.string().required("Description is required"),
   userIds: Yup.array().of(Yup.number()),
 });
+
+const CHAHNGE_TASK_NAME = gql`
+  mutation changeTaskName($id: ID!, $name: String!) {
+    changeTaskName(id: $id, name: $name) {
+      __typename
+      id
+      name
+    }
+  }
+`;
+
+const CHAHNGE_TASK_DESCRIPTION = gql`
+  mutation changeTaskDescription($id: ID!, $description: String!) {
+    changeTaskDescription(id: $id, description: $description) {
+      __typename
+      id
+      description
+    }
+  }
+`;
 
 interface Props {
   modalData: {
@@ -51,6 +78,7 @@ interface Values {
 
 const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [assignees, setAssignees] = useState<number[]>([]);
 
   const { data } = useQuery(GET_PROJECT_USERS, {
@@ -60,17 +88,36 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
     },
   });
 
-  useQuery(GET_TASK, {
+  const { refetch, data: taskData } = useQuery(GET_TASK, {
     variables: {
       id: modalData?.taskId,
     },
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: "cache-and-network",
     skip: !modalData?.taskId,
     onCompleted: (data) => {
-      const { name, assignees } = data?.task ?? {};
+      const { name, assignees, description } = data?.task ?? {};
       setName(name);
+      setDescription(description);
       setAssignees(assignees?.map((user: any) => user?.id) ?? []);
     },
   });
+
+  const [changeTaskName, { loading: changeTaskLoading }] = useMutation(
+    CHAHNGE_TASK_NAME,
+    {
+      onError: () => {
+        refetch();
+      },
+    }
+  );
+
+  const [changeTaskDescription, { loading: changeTaskDescriptionLoading }] =
+    useMutation(CHAHNGE_TASK_DESCRIPTION, {
+      onError: () => {
+        refetch();
+      },
+    });
 
   const handleCloseModal = () => {
     setModalData((_) => ({
@@ -106,6 +153,28 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
     setName(e.target.value ?? "");
   };
 
+  const handleChangeDescription = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDescription(e.target.value ?? "");
+  };
+
+  const handleConfirmChangeTaskName = () => {
+    changeTaskName({
+      variables: {
+        id: modalData?.taskId,
+        name,
+      },
+    });
+  };
+
+  const handleConfirmChangeTaskDescription = () => {
+    changeTaskDescription({
+      variables: {
+        id: modalData?.taskId,
+        description,
+      },
+    });
+  };
+
   return (
     <CustomModal
       isOpen={modalData.isOpen}
@@ -113,109 +182,149 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
       onClose={handleCloseModal}
       disableBackdropClick={false}
     >
-      <TextField
-        label="name"
-        variant="outlined"
-        name={"name"}
-        type="text"
-        margin="normal"
-        className="capitalize"
-        value={name}
-        onChange={handleChangeTaskName}
-      />
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-3">
+          <TextField
+            variant="filled"
+            name={"name"}
+            type="text"
+            margin="normal"
+            className="capitalize w-full"
+            value={name}
+            onChange={handleChangeTaskName}
+            style={{
+              margin: 0,
+            }}
+            disabled={changeTaskLoading}
+          />
 
-      <TextField
-        multiline
-        rows={5}
-        label="description"
-        variant="outlined"
-        name={"description"}
-        type="text"
-        margin="normal"
-        className="capitalize"
-      />
+          {!!name && name != "" && name != taskData?.task?.name ? (
+            <IconButton
+              disabled={changeTaskLoading}
+              onClick={handleConfirmChangeTaskName}
+              className="m-0 mb-0"
+              style={{
+                marginBottom: 0,
+              }}
+            >
+              <Check color="success" />
+            </IconButton>
+          ) : null}
+        </div>
 
-      <div className="flex items-center gap-5">
-        <p>assign to</p>
-        <div className="border flex items-center gap-2 px-2 rounded-md">
-          <div className="flex items-center gap-1">
-            {selectedUsers?.map((user: any) => (
-              <Tooltip title={user?.name} key={user?.id}>
-                <IconButton
-                  key={user.id}
-                  className="w-[25px] h-[25px] bg-gray-500 text-white rounded-full flex items-center justify-center m-1 text-[10px] capitalize absolute"
-                  onClick={() => handleRemoveAssignee(user?.id)}
-                  style={{
-                    backgroundColor: "grey",
-                    color: "white",
-                    fontSize: 15,
-                  }}
-                >
-                  {user.name?.[0]}
+        <div className="flex items-center gap-3">
+          <TextField
+            multiline
+            rows={5}
+            label="description"
+            variant="outlined"
+            name={"description"}
+            type="text"
+            margin="normal"
+            className="capitalize w-full"
+            value={description}
+            onChange={handleChangeDescription}
+            disabled={changeTaskDescriptionLoading}
+          />
 
+          {!!description &&
+          description != "" &&
+          description != taskData?.task?.description ? (
+            <IconButton
+              disabled={changeTaskDescriptionLoading}
+              onClick={handleConfirmChangeTaskDescription}
+              className="m-0 mb-0"
+              style={{
+                marginBottom: 0,
+              }}
+            >
+              <Check color="success" />
+            </IconButton>
+          ) : null}
+        </div>
+
+        <div className="flex items-center gap-5">
+          <p>assign to</p>
+          <div className="border flex items-center gap-2 px-2 rounded-md">
+            <div className="flex items-center gap-1">
+              {selectedUsers?.map((user: any) => (
+                <Tooltip title={user?.name} key={user?.id}>
+                  <IconButton
+                    key={user.id}
+                    className="w-[25px] h-[25px] bg-gray-500 text-white rounded-full flex items-center justify-center m-1 text-[10px] capitalize absolute"
+                    onClick={() => handleRemoveAssignee(user?.id)}
+                    style={{
+                      backgroundColor: "grey",
+                      color: "white",
+                      fontSize: 15,
+                    }}
+                  >
+                    {user.name?.[0]}
+
+                    <Cancel
+                      className="group-hover:block absolute bottom-[-3px] right-[-3px] bg-white rounded-full"
+                      style={{ fontSize: 14 }}
+                      color="error"
+                    />
+                  </IconButton>
+                </Tooltip>
+              ))}
+            </div>
+
+            <IconButton onClick={handleAddAssignees}>
+              <Add />
+            </IconButton>
+          </div>
+        </div>
+
+        <Menu
+          open={!!anchorEl}
+          anchorEl={anchorEl}
+          onClose={() => {
+            setAnchorEl(null);
+          }}
+          MenuListProps={{
+            style: {
+              width: 200,
+            },
+          }}
+        >
+          {data?.project?.users?.map((user: any) => (
+            <MenuItem
+              onClick={() => handleAddOrRemoveUser(+user.id)}
+              key={user.id}
+            >
+              <span
+                key={user.id}
+                className="group w-[25px] h-[25px] bg-gray-500 text-white rounded-full flex items-center justify-center me-3 text-[10px] capitalize relative"
+                onClick={() => handleRemoveAssignee(user?.id)}
+                style={{
+                  backgroundColor: "grey",
+                  color: "white",
+                  fontSize: 15,
+                }}
+              >
+                {user.name?.[0]}
+
+                {assignees?.map(Number).includes(+user?.id) ? (
                   <Cancel
                     className="group-hover:block absolute bottom-[-3px] right-[-3px] bg-white rounded-full"
                     style={{ fontSize: 14 }}
                     color="error"
                   />
-                </IconButton>
-              </Tooltip>
-            ))}
-          </div>
-
-          <IconButton onClick={handleAddAssignees}>
-            <Add />
-          </IconButton>
-        </div>
+                ) : (
+                  <AddCircle
+                    className="group-hover:block absolute bottom-[-3px] right-[-3px] bg-white rounded-full"
+                    style={{ fontSize: 14 }}
+                    color="info"
+                  />
+                )}
+              </span>
+              {user.name}
+            </MenuItem>
+          ))}
+        </Menu>
       </div>
-
-      <Menu
-        open={!!anchorEl}
-        anchorEl={anchorEl}
-        onClose={() => {
-          setAnchorEl(null);
-        }}
-        MenuListProps={{
-          style: {
-            width: 200,
-          },
-        }}
-      >
-        {data?.project?.users?.map((user: any) => (
-          <MenuItem
-            onClick={() => handleAddOrRemoveUser(+user.id)}
-            key={user.id}
-          >
-            <span
-              key={user.id}
-              className="group w-[25px] h-[25px] bg-gray-500 text-white rounded-full flex items-center justify-center me-3 text-[10px] capitalize relative"
-              onClick={() => handleRemoveAssignee(user?.id)}
-              style={{
-                backgroundColor: "grey",
-                color: "white",
-                fontSize: 15,
-              }}
-            >
-              {user.name?.[0]}
-
-              {assignees?.map(Number).includes(+user?.id) ? (
-                <Cancel
-                  className="group-hover:block absolute bottom-[-3px] right-[-3px] bg-white rounded-full"
-                  style={{ fontSize: 14 }}
-                  color="error"
-                />
-              ) : (
-                <AddCircle
-                  className="group-hover:block absolute bottom-[-3px] right-[-3px] bg-white rounded-full"
-                  style={{ fontSize: 14 }}
-                  color="info"
-                />
-              )}
-            </span>
-            {user.name}
-          </MenuItem>
-        ))}
-      </Menu>
     </CustomModal>
   );
 };
