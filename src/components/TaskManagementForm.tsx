@@ -301,6 +301,7 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
               <MenuItem
                 onClick={() => handleChangeTaskStage(+stage?.id)}
                 key={stage?.id}
+                disabled={changeTaskStageLoading}
               >
                 {stage?.name}
               </MenuItem>
