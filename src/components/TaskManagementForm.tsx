@@ -10,7 +10,7 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { GET_PROJECT_USERS, GET_TASK } from "../graphql/queries";
+import { GET_PROJECT_USERS, GET_TASK, project } from "../graphql/queries";
 import { Add, AddCircle, Cancel } from "@mui/icons-material";
 
 const CHAHNGE_TASK_NAME = gql`
@@ -29,6 +29,19 @@ const CHAHNGE_TASK_DESCRIPTION = gql`
       __typename
       id
       description
+    }
+  }
+`;
+
+const CHANGE_TASK_STAGE = gql`
+  mutation changeTaskStage($id: ID!, $stageId: ID!) {
+    changeTaskStage(id: $id, stageId: $stageId) {
+      __typename
+      id
+      stage {
+        __typename
+        id
+      }
     }
   }
 `;
@@ -91,6 +104,8 @@ const theme = createTheme({
 const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [stage, setStage] = useState<any>(null);
+
   const [assignees, setAssignees] = useState<number[]>([]);
 
   const { data } = useQuery(GET_PROJECT_USERS, {
@@ -108,9 +123,10 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
     fetchPolicy: "cache-and-network",
     skip: !modalData?.taskId,
     onCompleted: (data) => {
-      const { name, assignees, description } = data?.task ?? {};
+      const { name, assignees, description, stage } = data?.task ?? {};
       setName(name);
       setDescription(description);
+      setStage(stage?.id);
       setAssignees(assignees?.map((user: any) => user?.id) ?? []);
     },
   });
@@ -131,6 +147,18 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
       },
     });
 
+  const [changeTaskStage, { loading: changeTaskStageLoading }] = useMutation(
+    CHANGE_TASK_STAGE,
+    {
+      onError: () => {
+        refetch();
+      },
+      refetchQueries: [
+        { query: project, variables: { id: modalData?.projectId } },
+      ],
+    }
+  );
+
   const handleCloseModal = () => {
     setModalData((_) => ({
       isOpen: false,
@@ -140,8 +168,18 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
 
   const [anchorEl, setAnchorEl] = useState<any>(null);
 
+  const [taskStatusMenu, setTaskStatusMenu] = useState<any>(null);
+
   const handleAddAssignees = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(e.currentTarget);
+  };
+
+  const handleOpenStatusMenu = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setTaskStatusMenu(e.currentTarget);
+  };
+
+  const handleCloseStatusMenu = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setTaskStatusMenu(null);
   };
 
   const handleAddOrRemoveUser = (userId: number) => {
@@ -193,12 +231,24 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
     });
   };
 
+  const handleChangeTaskStage = (stageId: number) => {
+    setStage(stageId);
+    setTaskStatusMenu(null);
+
+    changeTaskStage({
+      variables: {
+        id: modalData?.taskId,
+        stageId,
+      },
+    });
+  };
+
   return (
     <CustomModal
       isOpen={modalData.isOpen}
-      modalTitle="Task"
       onClose={handleCloseModal}
       disableBackdropClick={false}
+      className="rounded-lg"
     >
       <ThemeProvider theme={theme}>
         <div className="flex flex-col gap-4">
@@ -218,6 +268,44 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
             disabled={changeTaskLoading}
             autoComplete="off"
           />
+
+          <div className="grid grid-cols-2 gap-10">
+            <div className="flex items-center justify-between">
+              <p>status</p>
+              <IconButton onClick={handleOpenStatusMenu}>
+                {
+                  data?.project?.stages?.find(
+                    (projectStage: any) => projectStage?.id == stage
+                  )?.name
+                }
+              </IconButton>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <p>status</p>
+              <p>pending</p>
+            </div>
+          </div>
+
+          <Menu
+            open={!!taskStatusMenu}
+            anchorEl={taskStatusMenu}
+            onClose={handleCloseStatusMenu}
+            MenuListProps={{
+              style: {
+                width: 200,
+              },
+            }}
+          >
+            {data?.project?.stages?.map((stage: any) => (
+              <MenuItem
+                onClick={() => handleChangeTaskStage(+stage?.id)}
+                key={stage?.id}
+              >
+                {stage?.name}
+              </MenuItem>
+            ))}
+          </Menu>
 
           <hr />
 

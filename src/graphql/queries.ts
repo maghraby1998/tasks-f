@@ -45,11 +45,8 @@ export const GET_TASK = gql`
       assignees {
         id
       }
-      project {
-        users {
-          id
-          name
-        }
+      stage {
+        id
       }
     }
   }
@@ -100,6 +97,10 @@ export const GET_PROJECT_USERS = gql`
   query GetProjectUsers($projectId: ID!) {
     project(id: $projectId) {
       users {
+        id
+        name
+      }
+      stages {
         id
         name
       }

@@ -5,7 +5,7 @@ import React from "react";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  modalTitle: string;
+  modalTitle?: string;
   children: React.ReactNode;
   modalSize?: number;
   saveBtnLabel?: string;
@@ -13,6 +13,7 @@ interface Props {
   saveBtnLoading?: boolean;
   saveBtnStyle?: string;
   disableBackdropClick: boolean;
+  className?: string;
 }
 
 const CustomModal: React.FC<Props> = ({
@@ -26,13 +27,13 @@ const CustomModal: React.FC<Props> = ({
   saveBtnLoading = false,
   saveBtnStyle = "bg-secondary-color",
   disableBackdropClick = true,
+  className,
 }) => {
   return (
     <Modal
       open={isOpen}
-      className={`custom-modal-style`}
+      className={`custom-modal-style ${className ?? "rounded"}`}
       sx={{ width: `${modalSize}px` }}
-      // disableEscapeKeyDown
       slotProps={{
         backdrop: {
           onClick: () => {},
@@ -45,21 +46,22 @@ const CustomModal: React.FC<Props> = ({
         },
       }}
     >
-      <div className="rounded">
-        <div className="h-[40px] bg-primary-color w-full capitalize flex justify-between items-center text-white font-bold">
-          <p className="px-5">{modalTitle}</p>
-          {disableBackdropClick ? (
-            <button
-              className="bg-red-600 text-white text-xl font-bold h-full w-[50px]"
-              onClick={onClose}
-            >
-              x
-            </button>
-          ) : null}
-        </div>
-        <div className="bg-white px-5 py-5 rounded-bl rounded-br">
+      <div>
+        {modalTitle ? (
+          <div className="h-[40px] bg-primary-color w-full capitalize flex justify-between items-center text-white font-bold">
+            <p className="px-5">{modalTitle}</p>
+            {disableBackdropClick ? (
+              <button
+                className="bg-red-600 text-white text-xl font-bold h-full w-[50px]"
+                onClick={onClose}
+              >
+                x
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+        <div className="bg-white px-5 py-5">
           {children}
-          {/* <div className="h-[1px] w-full bg-black mt-5 mb-2 opacity-[0.5]"></div> */}
           {saveBtnLabel ? (
             <button
               onClick={saveBtnFunction}

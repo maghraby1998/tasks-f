@@ -62,7 +62,8 @@ const Board: React.FC = () => {
   };
 
   const { data: projectData } = useQuery(project, {
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
+    notifyOnNetworkStatusChange: true,
     variables: {
       id,
     },
