@@ -20,7 +20,7 @@ const CustomModal: React.FC<Props> = ({
   modalTitle,
   isOpen,
   onClose,
-  modalSize = "700 px",
+  modalSize = "700px",
   children,
   saveBtnLabel,
   saveBtnFunction = () => {},
