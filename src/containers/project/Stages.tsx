@@ -30,7 +30,7 @@ const Stages: React.FC<Props> = ({ stages, setStages }) => {
     if (!droppedItem.destination) return;
 
     if (droppedItem?.destination?.droppableId === "trash") {
-      let updatedList = [...stages];
+      const updatedList = [...stages];
       // Remove dragged item
       updatedList.splice(droppedItem.source.index, 1);
 
@@ -44,7 +44,7 @@ const Stages: React.FC<Props> = ({ stages, setStages }) => {
       return;
     }
 
-    let updatedList = [...stages];
+    const updatedList = [...stages];
     // Remove dragged item
     const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
     // Add dropped item
@@ -69,7 +69,7 @@ const Stages: React.FC<Props> = ({ stages, setStages }) => {
   };
 
   const handleAddNewStage = (index: number) => {
-    let updatedList = [...stages];
+    const updatedList = [...stages];
 
     // Add  item
     updatedList.splice(index + 1, 0, {

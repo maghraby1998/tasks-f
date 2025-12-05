@@ -1,24 +1,11 @@
 import React, { useState } from "react";
 import CustomModal from "./CustomModal";
-import TextInput from "../inputs/TextInput";
-import ValidateAt from "../enums/ValidateAt";
-import {
-  createTheme,
-  IconButton,
-  Input,
-  TextareaAutosize,
-  TextField,
-  Theme,
-  Popover,
-  Menu,
-  MenuItem,
-  Tooltip,
-} from "@mui/material";
+import { IconButton, TextField, Menu, MenuItem, Tooltip } from "@mui/material";
 import { useMutation, useQuery } from "@apollo/client";
-import { UPDATE_TASK, upsertTask } from "../graphql/mutations";
+import { upsertTask } from "../graphql/mutations";
 import { GET_PROJECT_USERS, GET_TASK, project } from "../graphql/queries";
 import { useFormik } from "formik";
-import { Add, PlusOne } from "@mui/icons-material";
+import { Add } from "@mui/icons-material";
 import * as Yup from "yup";
 
 const CreateTaskSchema = Yup.object().shape({
@@ -81,7 +68,7 @@ const TaskForm: React.FC<Props> = ({ modalData, setModalData }) => {
     },
   });
 
-  const { loading } = useQuery(GET_TASK, {
+  useQuery(GET_TASK, {
     variables: {
       id: modalData?.taskId,
     },
@@ -134,7 +121,7 @@ const TaskForm: React.FC<Props> = ({ modalData, setModalData }) => {
   // };
 
   const handleCloseModal = () => {
-    setModalData((_) => ({
+    setModalData(() => ({
       isOpen: false,
       projectId: null,
       stageId: null,

@@ -160,7 +160,7 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
   );
 
   const handleCloseModal = () => {
-    setModalData((_) => ({
+    setModalData(() => ({
       isOpen: false,
       taskId: null,
     }));
@@ -178,7 +178,7 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
     setTaskStatusMenu(e.currentTarget);
   };
 
-  const handleCloseStatusMenu = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleCloseStatusMenu = () => {
     setTaskStatusMenu(null);
   };
 
