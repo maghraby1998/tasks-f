@@ -2,15 +2,17 @@ import { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import TextInput from "../../inputs/TextInput";
 import { Add, DeleteForever, DragHandle } from "@mui/icons-material";
-import { IconButton, Slide } from "@mui/material";
+import { IconButton, Popover, Slide } from "@mui/material";
+import { ColorPicker, IColor, ColorService } from "react-color-palette";
 
 interface Props {
-  stages: { order: number; name: string }[];
+  stages: { order: number; name: string; color: IColor }[];
   setStages: React.Dispatch<
     React.SetStateAction<
       {
         order: number;
         name: string;
+        color: IColor;
       }[]
     >
   >;
@@ -18,6 +20,8 @@ interface Props {
 
 const Stages: React.FC<Props> = ({ stages, setStages }) => {
   const [isDraggingMode, setIsDraggingMode] = useState(false);
+
+  const [stageColorPickerEl, setstageColorPickerEl] = useState<any>(null);
 
   // Function to update list on drop
   const handleDrop = (droppedItem: any) => {
@@ -68,7 +72,11 @@ const Stages: React.FC<Props> = ({ stages, setStages }) => {
     let updatedList = [...stages];
 
     // Add  item
-    updatedList.splice(index + 1, 0, { order: index + 2, name: "" });
+    updatedList.splice(index + 1, 0, {
+      order: index + 2,
+      name: "",
+      color: ColorService.convert("hex", "#777"),
+    });
 
     // reorder stages' order
     const result = updatedList.map((listItem, index) => ({
@@ -77,6 +85,21 @@ const Stages: React.FC<Props> = ({ stages, setStages }) => {
     }));
     // Update State
     setStages(result);
+  };
+
+  const handleChangeStageColor = (color: IColor, index: number) => {
+    setStages((prev) =>
+      prev?.map((stage, i) => {
+        if (i == index) {
+          return {
+            ...stage,
+            color,
+          };
+        } else {
+          return stage;
+        }
+      })
+    );
   };
 
   return (
@@ -116,36 +139,65 @@ const Stages: React.FC<Props> = ({ stages, setStages }) => {
                     {(provideddd) => {
                       return (
                         <div
-                          className="item-container"
+                          className="flex items-center gap-3"
                           ref={provideddd.innerRef}
                           {...provideddd.dragHandleProps}
                           {...provideddd.draggableProps}
                         >
-                          <IconButton
-                            sx={{
-                              color: "#fff",
-                              backgroundColor: "#555",
-                              height: "50px",
-                              width: "50px",
-                              borderRadius: 0,
-                              ":hover": {
+                          <div className="item-container">
+                            <IconButton
+                              sx={{
+                                color: "#fff",
                                 backgroundColor: "#555",
-                              },
+                                height: "50px",
+                                width: "50px",
+                                borderRadius: 0,
+                                ":hover": {
+                                  backgroundColor: "#555",
+                                },
+                              }}
+                            >
+                              <DragHandle />
+                            </IconButton>
+                            <TextInput
+                              name={`item-${index}`}
+                              value={item.name}
+                              onChange={(e) =>
+                                handleChangeStageName(e.target.value, index)
+                              }
+                              className="hidden"
+                              inputVariant="standard"
+                              InputProps={{ disableUnderline: true }}
+                              containerStyle="border-l h-full flex items-center pl-2 w-full"
+                            />
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={(e) =>
+                              setstageColorPickerEl(e.currentTarget)
+                            }
+                            style={{
+                              height: 20,
+                              width: 100,
+                              backgroundColor: item.color.hex,
+                            }}
+                          />
+
+                          <Popover
+                            open={!!stageColorPickerEl}
+                            anchorEl={stageColorPickerEl}
+                            onClose={() => {
+                              setstageColorPickerEl(null);
                             }}
                           >
-                            <DragHandle />
-                          </IconButton>
-                          <TextInput
-                            name={`item-${index}`}
-                            value={item.name}
-                            onChange={(e) =>
-                              handleChangeStageName(e.target.value, index)
-                            }
-                            className="hidden"
-                            inputVariant="standard"
-                            InputProps={{ disableUnderline: true }}
-                            containerStyle="border-l h-full flex items-center pl-2 w-full"
-                          />
+                            <ColorPicker
+                              color={item?.color}
+                              onChange={(color) =>
+                                handleChangeStageColor(color, index)
+                              }
+                            />
+                          </Popover>
                         </div>
                       );
                     }}

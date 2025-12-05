@@ -4342,6 +4342,11 @@ react-beautiful-dnd@^13.1.1:
     redux "^4.0.4"
     use-memo-one "^1.1.1"
 
+react-color-palette@^7.3.1:
+  version "7.3.1"
+  resolved "https://registry.yarnpkg.com/react-color-palette/-/react-color-palette-7.3.1.tgz#0ddc7aa16b5f3bd717b0e7247cd1181f5a5c1fb0"
+  integrity sha512-O8eTbogOKExVbhFOCaQ6WACQtGznymLqbd95i4C42PZd8im9OwL1NjuGxswk2JxJR5jfcTu7KQzl7VbpU48m+g==
+
 react-dom@^18.2.0:
   version "18.2.0"
   resolved "https://registry.npmjs.org/react-dom/-/react-dom-18.2.0.tgz"

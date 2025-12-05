@@ -21,6 +21,7 @@ export const project = gql`
         id
         name
         order
+        color
         tasks {
           __typename
           id
@@ -103,6 +104,7 @@ export const GET_PROJECT_USERS = gql`
       stages {
         id
         name
+        color
       }
     }
   }

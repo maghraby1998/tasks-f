@@ -209,7 +209,12 @@ const Board: React.FC = () => {
                               {...provided.droppableProps}
                               ref={provided.innerRef}
                             >
-                              <div className="h-[30px] bg-primary-color px-2 rounded-sm flex items-center justify-between">
+                              <div
+                                className="h-[30px] px-2 rounded-sm flex items-center justify-between"
+                                style={{
+                                  backgroundColor: stage?.color,
+                                }}
+                              >
                                 <div className="flex items-center">
                                   <h3
                                     title={stage?.name}

@@ -235,12 +235,14 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
     setStage(stageId);
     setTaskStatusMenu(null);
 
-    changeTaskStage({
-      variables: {
-        id: modalData?.taskId,
-        stageId,
-      },
-    });
+    if (stageId != taskData?.task?.stage?.id) {
+      changeTaskStage({
+        variables: {
+          id: modalData?.taskId,
+          stageId,
+        },
+      });
+    }
   };
 
   return (
@@ -249,6 +251,7 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
       onClose={handleCloseModal}
       disableBackdropClick={false}
       className="rounded-lg"
+      modalSize={"75%"}
     >
       <ThemeProvider theme={theme}>
         <div className="flex flex-col gap-4">
@@ -261,7 +264,8 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
             onChange={handleChangeTaskName}
             InputProps={{
               style: {
-                fontSize: 20,
+                fontSize: 24,
+                fontWeight: "bold",
               },
             }}
             onBlur={handleTaskNameBlur}
@@ -270,20 +274,27 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
           />
 
           <div className="grid grid-cols-2 gap-10">
-            <div className="flex items-center justify-between">
-              <p>status</p>
-              <IconButton onClick={handleOpenStatusMenu}>
+            <div className="flex items-center gap-10">
+              <p className="text-primary-color font-semibold">status</p>
+              <IconButton
+                style={{
+                  fontSize: 16,
+                  backgroundColor: data?.project?.stages?.find(
+                    (projectStage: any) => projectStage?.id == stage
+                  )?.color,
+                  borderRadius: 5,
+                  fontWeight: "bold",
+                  color: "white",
+                  paddingBlock: 3,
+                }}
+                onClick={handleOpenStatusMenu}
+              >
                 {
                   data?.project?.stages?.find(
                     (projectStage: any) => projectStage?.id == stage
                   )?.name
                 }
               </IconButton>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <p>status</p>
-              <p>pending</p>
             </div>
           </div>
 
@@ -302,6 +313,12 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
                 onClick={() => handleChangeTaskStage(+stage?.id)}
                 key={stage?.id}
                 disabled={changeTaskStageLoading}
+                style={{
+                  backgroundColor: stage?.color,
+                  color: "white",
+                  borderRadius: 5,
+                  margin: 10,
+                }}
               >
                 {stage?.name}
               </MenuItem>

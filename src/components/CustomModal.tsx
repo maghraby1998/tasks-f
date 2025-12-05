@@ -7,7 +7,7 @@ interface Props {
   onClose: () => void;
   modalTitle?: string;
   children: React.ReactNode;
-  modalSize?: number;
+  modalSize?: string;
   saveBtnLabel?: string;
   saveBtnFunction?: (e?: any) => void;
   saveBtnLoading?: boolean;
@@ -20,7 +20,7 @@ const CustomModal: React.FC<Props> = ({
   modalTitle,
   isOpen,
   onClose,
-  modalSize = 700,
+  modalSize = "700 px",
   children,
   saveBtnLabel,
   saveBtnFunction = () => {},
@@ -33,7 +33,7 @@ const CustomModal: React.FC<Props> = ({
     <Modal
       open={isOpen}
       className={`custom-modal-style ${className ?? "rounded"}`}
-      sx={{ width: `${modalSize}px` }}
+      sx={{ width: modalSize }}
       slotProps={{
         backdrop: {
           onClick: () => {},

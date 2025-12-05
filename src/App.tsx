@@ -18,6 +18,7 @@ import SignUp from "./containers/login/SignUp";
 import { useEffect } from "react";
 import { messaging, onMessageListener } from "./firebase";
 import { getToken } from "firebase/messaging";
+import "react-color-palette/css";
 
 const App = () => {
   useEffect(() => {

@@ -9,7 +9,7 @@ import { project, projects } from "../../graphql/queries";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-// import Members from "./Members";
+import { IColor } from "react-color-palette";
 
 // interface Stage {
 //   name: string;
@@ -31,7 +31,7 @@ const CreateProject = () => {
   const [formData, setFormData] = useState<FormData>(formInitialState);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [stages, setStages] = useState<
-    { id?: number; order: number; name: string }[]
+    { id?: number; order: number; name: string; color: IColor }[]
   >([]);
   const [clientErrors, setClientErrors] = useState([]);
   const [isSnackBarOpen, setIsSnackBarOpen] = useState(false);
@@ -44,10 +44,21 @@ const CreateProject = () => {
       setFormData({ id, name });
       setStages(
         stages?.map(
-          ({ id, name, order }: { id: any; name: any; order: any }) => ({
+          ({
             id,
             name,
             order,
+            color,
+          }: {
+            id: any;
+            name: any;
+            order: any;
+            color: IColor;
+          }) => ({
+            id,
+            name,
+            order,
+            color,
           })
         )
       );
@@ -62,7 +73,13 @@ const CreateProject = () => {
 
   const [attemptUpsertProject] = useMutation(upsertProject, {
     variables: {
-      input: { name: formData.name, stages },
+      input: {
+        name: formData.name,
+        stages: stages?.map((stage) => ({
+          ...stage,
+          color: stage.color.hex,
+        })),
+      },
     },
     onCompleted: (data) => {
       navigate(`/board/${data?.upsertProject?.id}`);
