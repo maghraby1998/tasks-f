@@ -13,8 +13,8 @@ interface Props {
 
 const TaskCard: React.FC<Props> = ({ task }) => {
   return (
-    <div className="text-sm bg-gray-400/20 p-2 my-2 min-h-[100px] rounded-sm">
-      <p>{task?.name}</p>
+    <div className="text-sm p-2 my-2 min-h-[100px] rounded-sm task-card">
+      <p className="font-semibold">{task?.name}</p>
       {task.assignees.map((assignee) => (
         <Avatar
           key={assignee.id}

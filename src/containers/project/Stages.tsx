@@ -190,6 +190,9 @@ const Stages: React.FC<Props> = ({ stages, setStages }) => {
                             onClose={() => {
                               setstageColorPickerEl(null);
                             }}
+                            style={{
+                              marginInlineStart: 130,
+                            }}
                           >
                             <ColorPicker
                               color={item?.color}

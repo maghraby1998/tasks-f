@@ -189,7 +189,7 @@ const Board: React.FC = () => {
                   sx={{
                     ":hover": {
                       ".unique-icon-button-class": {
-                        display: "flex",
+                        display: isDraggingMode ? "none" : "flex",
                         alignItems: "center",
                       },
                     },
@@ -292,7 +292,10 @@ const Board: React.FC = () => {
                         </Droppable>
                       </div>
                     ) : (
-                      <div className="w-[40px] min-h-[350px] bg-primary-color rounded-sm">
+                      <div
+                        className="w-[40px] min-h-[350px] rounded-sm"
+                        style={{ backgroundColor: stage?.color }}
+                      >
                         <IconButton
                           sx={{ color: "#fff", marginBottom: 2 }}
                           onClick={() => handleUnCollapseStage(stage?.id)}

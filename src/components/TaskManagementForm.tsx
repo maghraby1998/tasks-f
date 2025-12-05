@@ -283,7 +283,6 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
                     (projectStage: any) => projectStage?.id == stage
                   )?.color,
                   borderRadius: 5,
-                  fontWeight: "bold",
                   color: "white",
                   paddingBlock: 3,
                 }}
