@@ -1,7 +1,7 @@
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { GET_TASK, project } from "../../graphql/queries";
+import { project } from "../../graphql/queries";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { Alert, Box, Grow, IconButton, Snackbar } from "@mui/material";
 import {
@@ -46,10 +46,6 @@ const Board: React.FC = () => {
     taskId: null,
     projectId: null,
   });
-
-  const [taskFormClientErrors, setTaskFormClientErrors] = useState<string[]>(
-    []
-  );
 
   const [collapsedStages, setCollapsedStages] = useState<number[]>([]);
 
@@ -138,6 +134,8 @@ const Board: React.FC = () => {
   };
 
   const handleEditTask = (taskId: number) => {
+    console.trace();
+
     setEditTaskModalData({ isOpen: true, taskId, projectId: id ? +id : null });
   };
 
@@ -258,7 +256,14 @@ const Board: React.FC = () => {
                                               {...provideddd.dragHandleProps}
                                               {...provideddd.draggableProps}
                                             >
-                                              <TaskCard task={task} />
+                                              <TaskCard
+                                                task={task}
+                                                projectId={id ? +id : 0}
+                                                projectUsers={
+                                                  projectData?.project?.users ??
+                                                  []
+                                                }
+                                              />
                                             </div>
                                           );
                                         }}

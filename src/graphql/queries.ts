@@ -16,6 +16,10 @@ export const project = gql`
       __typename
       id
       name
+      users {
+        id
+        name
+      }
       stages {
         __typename
         id
