@@ -139,3 +139,11 @@ export const UNASSIGN_USER_FROM_TASK = gql`
     }
   }
 `;
+
+export const DELETE_TASK = gql`
+  mutation deleteTask($id: ID!) {
+    deleteTask(id: $id) {
+      id
+    }
+  }
+`;

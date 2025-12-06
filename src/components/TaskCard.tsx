@@ -1,12 +1,14 @@
-import { Add, AddCircle, Cancel } from "@mui/icons-material";
+import { Add, AddCircle, Cancel, MoreVert } from "@mui/icons-material";
 import { IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 import {
   ASSIGN_USER_TO_TASK,
+  DELETE_TASK,
   UNASSIGN_USER_FROM_TASK,
 } from "../graphql/mutations";
 import { useMutation } from "@apollo/client";
 import { project } from "../graphql/queries";
+import Swal from "sweetalert2";
 
 interface assignee {
   id: number;
@@ -26,11 +28,16 @@ interface Props {
 
 const TaskCard: React.FC<Props> = ({ task, projectId, projectUsers }) => {
   const [anchorEl, setAnchorEl] = useState<any>(null);
+  const [taskMenu, setTaskMenu] = useState<any>(null);
 
   const handleAddAssignees = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setAnchorEl(e.currentTarget);
   };
+
+  const [deleteTask] = useMutation(DELETE_TASK, {
+    refetchQueries: [{ query: project, variables: { id: projectId } }],
+  });
 
   const [assignUserToTasl] = useMutation(ASSIGN_USER_TO_TASK, {
     onError: () => {},
@@ -76,8 +83,73 @@ const TaskCard: React.FC<Props> = ({ task, projectId, projectUsers }) => {
     });
   };
 
+  const handleOpenTaskMenu = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    setTaskMenu(e.currentTarget);
+  };
+
+  const handleCloseTaskMenu = () => {
+    setTaskMenu(null);
+  };
+
+  const handleDeleteTask = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      cancelButtonColor: "#3085d6",
+    }).then(({ isConfirmed }) => {
+      if (isConfirmed) {
+        deleteTask({
+          variables: {
+            id: task?.id,
+          },
+        });
+      }
+    });
+  };
+
   return (
-    <div className="text-sm p-2 my-2 min-h-[100px] rounded-sm task-card">
+    <div className="text-sm p-2 my-2 min-h-[100px] rounded-sm task-card relative">
+      <IconButton
+        sx={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleOpenTaskMenu(e);
+        }}
+      >
+        <MoreVert fontSize="small" />
+      </IconButton>
+
+      <Menu
+        open={!!taskMenu}
+        anchorEl={taskMenu}
+        onClose={(e: any) => {
+          e.stopPropagation();
+          handleCloseTaskMenu();
+        }}
+        MenuListProps={{
+          style: {
+            width: 200,
+          },
+        }}
+      >
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDeleteTask();
+          }}
+        >
+          Delete
+        </MenuItem>
+      </Menu>
+
       <p className="font-semibold">{task?.name}</p>
 
       <div className="flex items-center gap-2 rounded-md">
