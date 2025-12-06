@@ -248,7 +248,7 @@ const TaskForm: React.FC<Props> = ({ modalData, setModalData }) => {
             >
               <span
                 key={user.id}
-                className="w-[25px] h-[25px] bg-gray-500 text-white rounded-full flex items-center justify-center me-3 text-[10px] capitalize"
+                className="min-w-[25px] min-h-[25px] w-[25px] h-[25px] bg-gray-500 text-white rounded-full flex items-center justify-center me-3 text-[10px] capitalize"
                 onClick={() => handleRemoveAssignee(user?.id)}
                 style={{
                   backgroundColor: "grey",
