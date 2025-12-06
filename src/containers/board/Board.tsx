@@ -155,7 +155,7 @@ const Board: React.FC = () => {
 
   return (
     <div className="py-2 mt-[80px] max-w-full overflow-hidden m-0">
-      <div className="mx-5 p-2 rounded-sm bg-secondary-color flex items-center justify-between">
+      <div className="mx-5 p-2 rounded-md bg-secondary-color flex items-center justify-between">
         <h2 className="capitalize text-[#333] font-bold">
           {projectData?.project?.name}
         </h2>
