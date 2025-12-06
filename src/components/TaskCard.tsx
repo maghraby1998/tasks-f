@@ -80,13 +80,13 @@ const TaskCard: React.FC<Props> = ({ task, projectId, projectUsers }) => {
     <div className="text-sm p-2 my-2 min-h-[100px] rounded-sm task-card">
       <p className="font-semibold">{task?.name}</p>
 
-      <div className="border flex items-center gap-2 px-2 rounded-md">
+      <div className="flex items-center gap-2 rounded-md">
         <div className="flex items-center gap-1">
           {task.assignees?.map((user: any) => (
             <Tooltip title={user?.name} key={user?.id}>
               <IconButton
                 key={user.id}
-                className="w-[25px] h-[25px] bg-gray-500 text-white rounded-full flex items-center justify-center m-1 text-[10px] capitalize absolute"
+                className="min-w-[22px] min-h-[22px] w-[22px] h-[22px] bg-gray-500 text-white rounded-full flex items-center justify-center m-1 text-[10px] capitalize absolute"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleRemoveAssignee(user?.id);
@@ -110,7 +110,7 @@ const TaskCard: React.FC<Props> = ({ task, projectId, projectUsers }) => {
         </div>
 
         <IconButton onClick={handleAddAssignees}>
-          <Add />
+          <Add fontSize="small" />
         </IconButton>
       </div>
 
