@@ -10,7 +10,7 @@ import * as Yup from "yup";
 
 const CreateTaskSchema = Yup.object().shape({
   name: Yup.string().required("Task name is required"),
-  description: Yup.string().required("Description is required"),
+  description: Yup.string(),
   userIds: Yup.array().of(Yup.number()),
 });
 

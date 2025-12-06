@@ -9,7 +9,7 @@ import { project, projects } from "../../graphql/queries";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { IColor } from "react-color-palette";
+import { ColorService, IColor } from "react-color-palette";
 
 // interface Stage {
 //   name: string;
@@ -53,12 +53,12 @@ const CreateProject = () => {
             id: any;
             name: any;
             order: any;
-            color: IColor;
+            color: string;
           }) => ({
             id,
             name,
             order,
-            color,
+            color: ColorService.convert("hex", color),
           })
         )
       );
@@ -96,7 +96,14 @@ const CreateProject = () => {
 
   const [attemptUpdateProject] = useMutation(updateProject, {
     variables: {
-      input: { id: formData?.id, name: formData.name, stages },
+      input: {
+        id: formData?.id,
+        name: formData.name,
+        stages: stages?.map((stage) => ({
+          ...stage,
+          color: stage.color.hex,
+        })),
+      },
     },
     onCompleted: (data) => {
       navigate(`/board/${data?.updateProject?.id}`);

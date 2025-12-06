@@ -18,10 +18,18 @@ interface Props {
   >;
 }
 
+const STAGE_COLOR_INIT_STATE = {
+  stageIndex: null,
+  anchorEl: null,
+};
+
 const Stages: React.FC<Props> = ({ stages, setStages }) => {
   const [isDraggingMode, setIsDraggingMode] = useState(false);
 
-  const [stageColorPickerEl, setstageColorPickerEl] = useState<any>(null);
+  const [editStageColor, setEditStageColor] = useState<{
+    stageIndex: number | null;
+    anchorEl: any;
+  }>(STAGE_COLOR_INIT_STATE);
 
   // Function to update list on drop
   const handleDrop = (droppedItem: any) => {
@@ -137,6 +145,8 @@ const Stages: React.FC<Props> = ({ stages, setStages }) => {
                     index={index}
                   >
                     {(provideddd) => {
+                      console.log("index", index);
+
                       return (
                         <div
                           className="flex items-center gap-3"
@@ -175,7 +185,10 @@ const Stages: React.FC<Props> = ({ stages, setStages }) => {
                           <button
                             type="button"
                             onClick={(e) =>
-                              setstageColorPickerEl(e.currentTarget)
+                              setEditStageColor({
+                                anchorEl: e?.currentTarget,
+                                stageIndex: index,
+                              })
                             }
                             style={{
                               height: 20,
@@ -183,24 +196,6 @@ const Stages: React.FC<Props> = ({ stages, setStages }) => {
                               backgroundColor: item.color.hex,
                             }}
                           />
-
-                          <Popover
-                            open={!!stageColorPickerEl}
-                            anchorEl={stageColorPickerEl}
-                            onClose={() => {
-                              setstageColorPickerEl(null);
-                            }}
-                            style={{
-                              marginInlineStart: 130,
-                            }}
-                          >
-                            <ColorPicker
-                              color={item?.color}
-                              onChange={(color) =>
-                                handleChangeStageColor(color, index)
-                              }
-                            />
-                          </Popover>
                         </div>
                       );
                     }}
@@ -261,6 +256,27 @@ const Stages: React.FC<Props> = ({ stages, setStages }) => {
           </div>
         </Slide>
       </DragDropContext>
+
+      <Popover
+        open={!!editStageColor.anchorEl}
+        anchorEl={editStageColor.anchorEl}
+        onClose={() => {
+          setEditStageColor(STAGE_COLOR_INIT_STATE);
+        }}
+        style={{
+          marginInlineStart: 130,
+        }}
+      >
+        <ColorPicker
+          color={
+            stages?.find((_, i) => i === editStageColor?.stageIndex)?.color ||
+            ColorService.convert("hex", "#777")
+          }
+          onChange={(color) =>
+            handleChangeStageColor(color, editStageColor?.stageIndex as number)
+          }
+        />
+      </Popover>
     </div>
   );
 };
