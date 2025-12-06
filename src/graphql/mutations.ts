@@ -123,3 +123,19 @@ export const SIGNUP = gql`
     }
   }
 `;
+
+export const ASSIGN_USER_TO_TASK = gql`
+  mutation assignUserToTask($taskId: ID!, $userId: ID!) {
+    assignUserToTask(taskId: $taskId, userId: $userId) {
+      id
+    }
+  }
+`;
+
+export const UNASSIGN_USER_FROM_TASK = gql`
+  mutation unAssignUserFromTask($taskId: ID!, $userId: ID!) {
+    unAssignUserFromTask(taskId: $taskId, userId: $userId) {
+      id
+    }
+  }
+`;

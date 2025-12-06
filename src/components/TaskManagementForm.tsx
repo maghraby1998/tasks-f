@@ -12,6 +12,10 @@ import {
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { GET_PROJECT_USERS, GET_TASK, project } from "../graphql/queries";
 import { Add, AddCircle, Cancel } from "@mui/icons-material";
+import {
+  ASSIGN_USER_TO_TASK,
+  UNASSIGN_USER_FROM_TASK,
+} from "../graphql/mutations";
 
 const CHAHNGE_TASK_NAME = gql`
   mutation changeTaskName($id: ID!, $name: String!) {
@@ -159,6 +163,26 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
     }
   );
 
+  const [assignUserToTasl] = useMutation(ASSIGN_USER_TO_TASK, {
+    onError: () => {
+      refetch();
+    },
+
+    refetchQueries: [
+      { query: project, variables: { id: modalData?.projectId } },
+    ],
+  });
+
+  const [unAssignUserFromTask] = useMutation(UNASSIGN_USER_FROM_TASK, {
+    onError: () => {
+      refetch();
+    },
+
+    refetchQueries: [
+      { query: project, variables: { id: modalData?.projectId } },
+    ],
+  });
+
   const handleCloseModal = () => {
     setModalData(() => ({
       isOpen: false,
@@ -185,14 +209,32 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
   const handleAddOrRemoveUser = (userId: number) => {
     if (assignees?.map(Number).includes(+userId)) {
       setAssignees((prev: any) => prev?.filter((id: any) => id != userId));
+      unAssignUserFromTask({
+        variables: {
+          taskId: modalData?.taskId,
+          userId,
+        },
+      });
     } else {
       setAssignees((prev: any) => [...prev, userId]);
       setAnchorEl(null);
+      assignUserToTasl({
+        variables: {
+          taskId: modalData?.taskId,
+          userId,
+        },
+      });
     }
   };
 
   const handleRemoveAssignee = (userId: number) => {
     setAssignees((prev) => prev?.filter((id) => id != userId));
+    unAssignUserFromTask({
+      variables: {
+        taskId: modalData?.taskId,
+        userId,
+      },
+    });
   };
 
   const selectedUsers = data?.project?.users?.filter((user: any) =>
