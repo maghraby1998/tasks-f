@@ -23,6 +23,7 @@
     "@reduxjs/toolkit": "^1.9.5",
     "@types/firebase": "^3.2.1",
     "@types/react-beautiful-dnd": "^13.1.4",
+    "apollo-upload-client": "14",
     "firebase": "^10.5.2",
     "formik": "^2.4.9",
     "framer-motion": "^10.16.0",

@@ -13,6 +13,7 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import { GET_PROJECT_USERS, GET_TASK, project } from "../graphql/queries";
 import { Add, AddCircle, Cancel } from "@mui/icons-material";
 import {
+  ADD_DOCUMENT_TO_TASK,
   ASSIGN_USER_TO_TASK,
   UNASSIGN_USER_FROM_TASK,
 } from "../graphql/mutations";
@@ -110,6 +111,8 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
   const [description, setDescription] = useState("");
   const [stage, setStage] = useState<any>(null);
 
+  const [file, setFile] = useState<any>(null);
+
   const [assignees, setAssignees] = useState<number[]>([]);
 
   const { data } = useQuery(GET_PROJECT_USERS, {
@@ -143,6 +146,12 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
       },
     }
   );
+
+  const [addDocument] = useMutation(ADD_DOCUMENT_TO_TASK, {
+    onError: () => {
+      refetch();
+    },
+  });
 
   const [changeTaskDescription, { loading: changeTaskDescriptionLoading }] =
     useMutation(CHAHNGE_TASK_DESCRIPTION, {
@@ -463,6 +472,31 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
               </MenuItem>
             ))}
           </Menu>
+
+          <h3 className="font-semibold">Documents</h3>
+
+          <input
+            type="file"
+            onChange={(e) => {
+              e.target.files && setFile(e.target.files[0]);
+            }}
+          />
+
+          <button
+            type="button"
+            onClick={() => {
+              if (file) {
+                addDocument({
+                  variables: {
+                    id: modalData?.taskId,
+                    document: file,
+                  },
+                });
+              }
+            }}
+          >
+            send document
+          </button>
         </div>
       </ThemeProvider>
     </CustomModal>
