@@ -37,6 +37,7 @@ export const project = gql`
           thumbnail {
             path
           }
+          description
         }
       }
     }

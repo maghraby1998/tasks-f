@@ -6,7 +6,7 @@ import {
   DeleteForever,
   MoreVert,
 } from "@mui/icons-material";
-import { IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
+import { IconButton, Menu, MenuItem, Tooltip, Typography } from "@mui/material";
 import React, { useState } from "react";
 import {
   ASSIGN_USER_TO_TASK,
@@ -28,6 +28,7 @@ interface Task {
   thumbnail: {
     path: string;
   };
+  description: string;
 }
 
 interface Props {
@@ -124,26 +125,33 @@ const TaskCard: React.FC<Props> = ({ task, projectId, projectUsers }) => {
   };
 
   return (
-    <div className="text-sm relative task-card my-2 rounded overflow-hidden">
+    <div className="text-sm relative task-card my-2 rounded overflow-hidden group">
       <img
         className="w-100 cursor-pointer mb-2"
         src={`http://localhost:5000${task?.thumbnail?.path}`}
       />
 
       <div className="min-h-[100px] p-2">
-        <IconButton
-          sx={{
-            position: "absolute",
-            top: 0,
-            right: 0,
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleOpenTaskMenu(e);
+        <div
+          className="bg-white absolute top-1 right-2 rounded hidden group-hover:block task-card-actions-shadow"
+          style={{
+            ...(!!taskMenu
+              ? {
+                  display: "block",
+                }
+              : {}),
           }}
         >
-          <MoreVert fontSize="small" />
-        </IconButton>
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation();
+              handleOpenTaskMenu(e);
+            }}
+            size="small"
+          >
+            <MoreVert fontSize="small" />
+          </IconButton>
+        </div>
 
         <Menu
           open={!!taskMenu}
@@ -170,6 +178,10 @@ const TaskCard: React.FC<Props> = ({ task, projectId, projectUsers }) => {
         </Menu>
 
         <p className="font-semibold mb-2 capitalize">{task?.name}</p>
+
+        {task?.description ? (
+          <p className="line-clamp-2 text-gray-500 my-2">{task?.description}</p>
+        ) : null}
 
         <div className="flex items-center gap-2 rounded-md">
           <div className="flex items-center gap-1">

@@ -11,10 +11,11 @@ import {
 } from "@mui/material";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { GET_PROJECT_USERS, GET_TASK, project } from "../graphql/queries";
-import { Add, AddCircle, Cancel } from "@mui/icons-material";
+import { Add, AddCircle, Cancel, DeleteForever } from "@mui/icons-material";
 import {
   ADD_DOCUMENT_TO_TASK,
   ASSIGN_USER_TO_TASK,
+  DELETE_DOCUMENT,
   UNASSIGN_USER_FROM_TASK,
 } from "../graphql/mutations";
 import Lightbox from "yet-another-react-lightbox";
@@ -144,6 +145,15 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
 
   const [changeTaskName, { loading: changeTaskLoading }] = useMutation(
     CHAHNGE_TASK_NAME,
+    {
+      onError: () => {
+        refetch();
+      },
+    }
+  );
+
+  const [deleteDocument, { loading: deleteLoading }] = useMutation(
+    DELETE_DOCUMENT,
     {
       onError: () => {
         refetch();
@@ -298,6 +308,19 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
         },
       });
     }
+  };
+
+  const handleDeleteDocument = (id: number) => {
+    deleteDocument({
+      variables: {
+        id,
+      },
+      onCompleted: (data) => {
+        setDocuments((prev) =>
+          prev?.filter((doc: any) => doc?.id != data?.deleteDocument?.id)
+        );
+      },
+    });
   };
 
   return (
@@ -504,16 +527,32 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
 
           <div className="flex items-center gap-2">
             {documents?.map((doc: any) => (
-              <img
-                className="h-[120px] w-[140px] cursor-pointer task-image"
-                src={`http://localhost:5000${doc?.path}`}
-                onClick={() => {
-                  setLightbox({
-                    isOpen: true,
-                    src: `http://localhost:5000${doc?.path}`,
-                  });
-                }}
-              />
+              <div className="relative">
+                <img
+                  className="h-[120px] w-[140px] cursor-pointer task-image"
+                  src={`http://localhost:5000${doc?.path}`}
+                  onClick={() => {
+                    setLightbox({
+                      isOpen: true,
+                      src: `http://localhost:5000${doc?.path}`,
+                    });
+                  }}
+                />
+                <IconButton
+                  className="task-card-actions-shadow"
+                  style={{
+                    position: "absolute",
+                    top: -5,
+                    right: -5,
+                    backgroundColor: "white",
+                    width: 25,
+                    height: 25,
+                  }}
+                  onClick={() => handleDeleteDocument(doc?.id)}
+                >
+                  <DeleteForever color="error" fontSize="small" />
+                </IconButton>
+              </div>
             ))}
             <IconButton
               size="large"

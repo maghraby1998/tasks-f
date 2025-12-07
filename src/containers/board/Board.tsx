@@ -208,7 +208,7 @@ const Board: React.FC = () => {
                               ref={provided.innerRef}
                             >
                               <div
-                                className="h-[30px] px-2 rounded-sm flex items-center justify-between"
+                                className="h-[35px] px-2 rounded flex items-center justify-between"
                                 style={{
                                   backgroundColor: stage?.color,
                                 }}

@@ -157,3 +157,11 @@ export const ADD_DOCUMENT_TO_TASK = gql`
     }
   }
 `;
+
+export const DELETE_DOCUMENT = gql`
+  mutation deleteDocument($id: ID!) {
+    deleteDocument(id: $id) {
+      id
+    }
+  }
+`;
