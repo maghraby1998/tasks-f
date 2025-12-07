@@ -203,7 +203,7 @@ const Board: React.FC = () => {
                         <Droppable droppableId={stage?.id?.toString()}>
                           {(provided) => (
                             <div
-                              className="list-container w-[200px]"
+                              className="list-container w-[250px]"
                               {...provided.droppableProps}
                               ref={provided.innerRef}
                             >
@@ -216,7 +216,7 @@ const Board: React.FC = () => {
                                 <div className="flex items-center">
                                   <h3
                                     title={stage?.name}
-                                    className="text-white capitalize text-sm mr-2 font-bold truncate w-[120px]"
+                                    className="text-white capitalize text-sm mr-2 font-bold truncate max-w-[120px]"
                                   >
                                     {stage?.name}
                                   </h3>

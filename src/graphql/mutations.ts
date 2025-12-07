@@ -152,6 +152,8 @@ export const ADD_DOCUMENT_TO_TASK = gql`
   mutation addDocumentToTask($id: ID!, $document: Upload!) {
     addDocument(id: $id, document: $document) {
       id
+      name
+      path
     }
   }
 `;

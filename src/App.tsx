@@ -19,6 +19,7 @@ import { useEffect } from "react";
 import { messaging, onMessageListener } from "./firebase";
 import { getToken } from "firebase/messaging";
 import "react-color-palette/css";
+import "yet-another-react-lightbox/styles.css";
 
 const App = () => {
   useEffect(() => {

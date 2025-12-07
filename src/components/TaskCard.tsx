@@ -25,6 +25,9 @@ interface Task {
   id: number;
   name: string;
   assignees: assignee[];
+  thumbnail: {
+    path: string;
+  };
 }
 
 interface Props {
@@ -36,6 +39,8 @@ interface Props {
 const TaskCard: React.FC<Props> = ({ task, projectId, projectUsers }) => {
   const [anchorEl, setAnchorEl] = useState<any>(null);
   const [taskMenu, setTaskMenu] = useState<any>(null);
+
+  console.log("task", task);
 
   const handleAddAssignees = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -119,54 +124,111 @@ const TaskCard: React.FC<Props> = ({ task, projectId, projectUsers }) => {
   };
 
   return (
-    <div className="text-sm p-2 my-2 min-h-[100px] rounded-sm task-card relative">
-      <IconButton
-        sx={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-          handleOpenTaskMenu(e);
-        }}
-      >
-        <MoreVert fontSize="small" />
-      </IconButton>
+    <div className="text-sm relative task-card my-2 rounded overflow-hidden">
+      <img
+        className="w-100 cursor-pointer mb-2"
+        src={`http://localhost:5000${task?.thumbnail?.path}`}
+      />
 
-      <Menu
-        open={!!taskMenu}
-        anchorEl={taskMenu}
-        onClose={(e: any) => {
-          e.stopPropagation();
-          handleCloseTaskMenu();
-        }}
-        MenuListProps={{
-          style: {
-            width: 200,
-          },
-        }}
-      >
-        <MenuItem
+      <div className="min-h-[100px] p-2">
+        <IconButton
+          sx={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+          }}
           onClick={(e) => {
             e.stopPropagation();
-            handleDeleteTask();
+            handleOpenTaskMenu(e);
           }}
         >
-          <DeleteForever color="error" />
-          Delete
-        </MenuItem>
-      </Menu>
+          <MoreVert fontSize="small" />
+        </IconButton>
 
-      <p className="font-semibold">{task?.name}</p>
+        <Menu
+          open={!!taskMenu}
+          anchorEl={taskMenu}
+          onClose={(e: any) => {
+            e.stopPropagation();
+            handleCloseTaskMenu();
+          }}
+          MenuListProps={{
+            style: {
+              width: 200,
+            },
+          }}
+        >
+          <MenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDeleteTask();
+            }}
+          >
+            <DeleteForever color="error" />
+            Delete
+          </MenuItem>
+        </Menu>
 
-      <div className="flex items-center gap-2 rounded-md">
-        <div className="flex items-center gap-1">
-          {task.assignees?.map((user: any) => (
-            <Tooltip title={user?.name} key={user?.id}>
-              <IconButton
+        <p className="font-semibold mb-2 capitalize">{task?.name}</p>
+
+        <div className="flex items-center gap-2 rounded-md">
+          <div className="flex items-center gap-1">
+            {task.assignees?.map((user: any) => (
+              <Tooltip title={user?.name} key={user?.id}>
+                <IconButton
+                  key={user.id}
+                  className="min-w-[22px] min-h-[22px] w-[22px] h-[22px] bg-gray-500 text-white rounded-full flex items-center justify-center m-1 text-[10px] capitalize absolute"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveAssignee(user?.id);
+                  }}
+                  style={{
+                    backgroundColor: "grey",
+                    color: "white",
+                    fontSize: 15,
+                  }}
+                >
+                  {user.name?.[0]}
+
+                  <Cancel
+                    className="group-hover:block absolute bottom-[-3px] right-[-3px] bg-white rounded-full"
+                    style={{ fontSize: 14 }}
+                    color="error"
+                  />
+                </IconButton>
+              </Tooltip>
+            ))}
+          </div>
+
+          <IconButton onClick={handleAddAssignees}>
+            <Add fontSize="small" />
+          </IconButton>
+        </div>
+
+        <Menu
+          open={!!anchorEl}
+          anchorEl={anchorEl}
+          onClose={(e: any) => {
+            e.stopPropagation();
+            setAnchorEl(null);
+          }}
+          MenuListProps={{
+            style: {
+              width: 200,
+            },
+          }}
+        >
+          {projectUsers?.map((user: any) => (
+            <MenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddOrRemoveUser(+user.id);
+              }}
+              key={user.id}
+            >
+              <span
                 key={user.id}
-                className="min-w-[22px] min-h-[22px] w-[22px] h-[22px] bg-gray-500 text-white rounded-full flex items-center justify-center m-1 text-[10px] capitalize absolute"
+                className="group min-w-[25px] min-h-[25px] w-[25px] h-[25px] bg-gray-500 text-white rounded-full flex items-center justify-center me-3 text-[10px] capitalize relative"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleRemoveAssignee(user?.id);
@@ -179,78 +241,28 @@ const TaskCard: React.FC<Props> = ({ task, projectId, projectUsers }) => {
               >
                 {user.name?.[0]}
 
-                <Cancel
-                  className="group-hover:block absolute bottom-[-3px] right-[-3px] bg-white rounded-full"
-                  style={{ fontSize: 14 }}
-                  color="error"
-                />
-              </IconButton>
-            </Tooltip>
+                {task?.assignees
+                  ?.map((assignee: assignee) => assignee?.id)
+
+                  .includes(+user?.id) ? (
+                  <Cancel
+                    className="group-hover:block absolute bottom-[-3px] right-[-3px] bg-white rounded-full"
+                    style={{ fontSize: 14 }}
+                    color="error"
+                  />
+                ) : (
+                  <AddCircle
+                    className="group-hover:block absolute bottom-[-3px] right-[-3px] bg-white rounded-full"
+                    style={{ fontSize: 14 }}
+                    color="info"
+                  />
+                )}
+              </span>
+              {user.name}
+            </MenuItem>
           ))}
-        </div>
-
-        <IconButton onClick={handleAddAssignees}>
-          <Add fontSize="small" />
-        </IconButton>
+        </Menu>
       </div>
-
-      <Menu
-        open={!!anchorEl}
-        anchorEl={anchorEl}
-        onClose={(e: any) => {
-          e.stopPropagation();
-          setAnchorEl(null);
-        }}
-        MenuListProps={{
-          style: {
-            width: 200,
-          },
-        }}
-      >
-        {projectUsers?.map((user: any) => (
-          <MenuItem
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAddOrRemoveUser(+user.id);
-            }}
-            key={user.id}
-          >
-            <span
-              key={user.id}
-              className="group min-w-[25px] min-h-[25px] w-[25px] h-[25px] bg-gray-500 text-white rounded-full flex items-center justify-center me-3 text-[10px] capitalize relative"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRemoveAssignee(user?.id);
-              }}
-              style={{
-                backgroundColor: "grey",
-                color: "white",
-                fontSize: 15,
-              }}
-            >
-              {user.name?.[0]}
-
-              {task?.assignees
-                ?.map((assignee: assignee) => assignee?.id)
-
-                .includes(+user?.id) ? (
-                <Cancel
-                  className="group-hover:block absolute bottom-[-3px] right-[-3px] bg-white rounded-full"
-                  style={{ fontSize: 14 }}
-                  color="error"
-                />
-              ) : (
-                <AddCircle
-                  className="group-hover:block absolute bottom-[-3px] right-[-3px] bg-white rounded-full"
-                  style={{ fontSize: 14 }}
-                  color="info"
-                />
-              )}
-            </span>
-            {user.name}
-          </MenuItem>
-        ))}
-      </Menu>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import CustomModal from "./CustomModal";
 import {
   createTheme,
@@ -17,6 +17,7 @@ import {
   ASSIGN_USER_TO_TASK,
   UNASSIGN_USER_FROM_TASK,
 } from "../graphql/mutations";
+import Lightbox from "yet-another-react-lightbox";
 
 const CHAHNGE_TASK_NAME = gql`
   mutation changeTaskName($id: ID!, $name: String!) {
@@ -110,10 +111,11 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [stage, setStage] = useState<any>(null);
-
   const [file, setFile] = useState<any>(null);
-
   const [assignees, setAssignees] = useState<number[]>([]);
+  const [lightbox, setLightbox] = useState<any>({ isOpen: false, src: null });
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [documents, setDocuments] = useState<any[]>([]);
 
   const { data } = useQuery(GET_PROJECT_USERS, {
     skip: !modalData?.projectId,
@@ -130,11 +132,13 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
     fetchPolicy: "cache-and-network",
     skip: !modalData?.taskId,
     onCompleted: (data) => {
-      const { name, assignees, description, stage } = data?.task ?? {};
+      const { name, assignees, description, stage, documents } =
+        data?.task ?? {};
       setName(name);
       setDescription(description);
       setStage(stage?.id);
       setAssignees(assignees?.map((user: any) => user?.id) ?? []);
+      setDocuments(documents ?? []);
     },
   });
 
@@ -301,8 +305,8 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
       isOpen={modalData.isOpen}
       onClose={handleCloseModal}
       disableBackdropClick={false}
-      className="rounded-lg"
-      modalSize={"75%"}
+      className="rounded-lg task-management-modal-styles"
+      modalSize={"85%"}
     >
       <ThemeProvider theme={theme}>
         <div className="flex flex-col gap-4">
@@ -473,30 +477,64 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
             ))}
           </Menu>
 
+          <hr />
+
           <h3 className="font-semibold">Documents</h3>
 
           <input
+            id="upload-document-input"
             type="file"
+            className="hidden"
             onChange={(e) => {
+              addDocument({
+                variables: {
+                  id: modalData?.taskId,
+                  document: e?.target?.files?.[0],
+                },
+                onCompleted: (data) => {
+                  if (data?.addDocument) {
+                    setDocuments((prev) => [...prev, data?.addDocument]);
+                  }
+                },
+              });
               e.target.files && setFile(e.target.files[0]);
             }}
+            ref={fileInputRef}
           />
 
-          <button
-            type="button"
-            onClick={() => {
-              if (file) {
-                addDocument({
-                  variables: {
-                    id: modalData?.taskId,
-                    document: file,
-                  },
-                });
+          <div className="flex items-center gap-2">
+            {documents?.map((doc: any) => (
+              <img
+                className="h-[120px] w-[140px] cursor-pointer task-image"
+                src={`http://localhost:5000${doc?.path}`}
+                onClick={() => {
+                  setLightbox({
+                    isOpen: true,
+                    src: `http://localhost:5000${doc?.path}`,
+                  });
+                }}
+              />
+            ))}
+            <IconButton
+              size="large"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Add fontSize="large" />
+            </IconButton>
+          </div>
+
+          {lightbox?.isOpen && (
+            <Lightbox
+              open={lightbox.isOpen}
+              close={() =>
+                setLightbox({
+                  isOpen: false,
+                  src: null,
+                })
               }
-            }}
-          >
-            send document
-          </button>
+              slides={[{ src: lightbox.src }]}
+            />
+          )}
         </div>
       </ThemeProvider>
     </CustomModal>

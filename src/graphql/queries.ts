@@ -34,6 +34,9 @@ export const project = gql`
             id
             name
           }
+          thumbnail {
+            path
+          }
         }
       }
     }
@@ -52,6 +55,11 @@ export const GET_TASK = gql`
       }
       stage {
         id
+      }
+      documents {
+        id
+        name
+        path
       }
     }
   }
