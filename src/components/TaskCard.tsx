@@ -1,4 +1,11 @@
-import { Add, AddCircle, Cancel, MoreVert } from "@mui/icons-material";
+import {
+  Add,
+  AddCircle,
+  Cancel,
+  Delete,
+  DeleteForever,
+  MoreVert,
+} from "@mui/icons-material";
 import { IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 import {
@@ -146,6 +153,7 @@ const TaskCard: React.FC<Props> = ({ task, projectId, projectUsers }) => {
             handleDeleteTask();
           }}
         >
+          <DeleteForever color="error" />
           Delete
         </MenuItem>
       </Menu>
