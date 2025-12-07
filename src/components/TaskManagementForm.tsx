@@ -165,6 +165,9 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
     onError: () => {
       refetch();
     },
+    refetchQueries: [
+      { query: project, variables: { id: modalData?.projectId } },
+    ],
   });
 
   const [changeTaskDescription, { loading: changeTaskDescriptionLoading }] =
@@ -549,6 +552,7 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
                     height: 25,
                   }}
                   onClick={() => handleDeleteDocument(doc?.id)}
+                  disabled={deleteLoading}
                 >
                   <DeleteForever color="error" fontSize="small" />
                 </IconButton>
