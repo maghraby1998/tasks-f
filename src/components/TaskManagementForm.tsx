@@ -112,7 +112,6 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [stage, setStage] = useState<any>(null);
-  const [file, setFile] = useState<any>(null);
   const [assignees, setAssignees] = useState<number[]>([]);
   const [lightbox, setLightbox] = useState<any>({ isOpen: false, src: null });
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -508,7 +507,6 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
           <h3 className="font-semibold">Documents</h3>
 
           <input
-            id="upload-document-input"
             type="file"
             className="hidden"
             onChange={(e) => {
@@ -523,7 +521,6 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
                   }
                 },
               });
-              e.target.files && setFile(e.target.files[0]);
             }}
             ref={fileInputRef}
           />

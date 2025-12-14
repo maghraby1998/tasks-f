@@ -2,11 +2,10 @@ import {
   Add,
   AddCircle,
   Cancel,
-  Delete,
   DeleteForever,
   MoreVert,
 } from "@mui/icons-material";
-import { IconButton, Menu, MenuItem, Tooltip, Typography } from "@mui/material";
+import { IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 import {
   ASSIGN_USER_TO_TASK,
