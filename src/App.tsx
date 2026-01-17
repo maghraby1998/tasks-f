@@ -20,6 +20,7 @@ import { messaging, onMessageListener } from "./firebase";
 import { getToken } from "firebase/messaging";
 import "react-color-palette/css";
 import "yet-another-react-lightbox/styles.css";
+import { createTheme, ThemeProvider } from "@mui/material";
 
 const App = () => {
   useEffect(() => {
@@ -50,8 +51,14 @@ const App = () => {
   const token = useSelector((state: RootState) => state.auth.token);
 
   const isSideBarOpen = useSelector(
-    (state: RootState) => state.auth.isSideBarOpen
+    (state: RootState) => state.auth.isSideBarOpen,
   );
+
+  const theme = createTheme({
+    typography: {
+      fontFamily: '"Roboto", sans-serif',
+    },
+  });
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -78,18 +85,20 @@ const App = () => {
           <Route path="signup" element={<SignUp />} />
           <Route path="*" element={<Navigate to={"/login"} />} />
         </Route>
-      )
-    )
+      ),
+    ),
   );
 
   return (
-    <div
-      className={`${
-        isSideBarOpen && token ? "max-w-[calc(100vw-250px)]" : "max-w-screen"
-      } ml-auto`}
-    >
-      <RouterProvider router={router} />
-    </div>
+    <ThemeProvider theme={theme}>
+      <div
+        className={`${
+          isSideBarOpen && token ? "max-w-[calc(100vw-250px)]" : "max-w-screen"
+        } ml-auto`}
+      >
+        <RouterProvider router={router} />
+      </div>
+    </ThemeProvider>
   );
 };
 

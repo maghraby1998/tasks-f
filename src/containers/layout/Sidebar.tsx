@@ -34,7 +34,6 @@ const Sidebar = () => {
   };
 
   const handleAddNewProject = () => {
-    console.log("should navigate");
     navigate("/create-project");
   };
 

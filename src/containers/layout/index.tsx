@@ -9,7 +9,7 @@ import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { Link, Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import {
@@ -26,6 +26,7 @@ import TasksView from "../../enums/TasksView";
 import { client } from "../../graphql/client";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SettingsIcon from "@mui/icons-material/Settings";
+import Notifications from "./Notifications";
 
 const theme = createTheme({
   components: {
@@ -46,6 +47,8 @@ const theme = createTheme({
 
 const Layout = () => {
   const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
+
   const user = useSelector((state: RootState) => state.auth.user);
   const tasksView = useSelector((state: RootState) => state.auth.tasksView);
 
@@ -79,12 +82,16 @@ const Layout = () => {
     dispatch(toggleTasksView(value));
   };
 
+  const handleProfileSettings = () => {
+    navigate("/profile-settings");
+  };
+
   return (
     <>
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor: "#1F2937",
+          backgroundColor: "#fff",
           marginLeft: isSideBarOpen ? "250px" : 0,
           top: 0,
           left: 0,
@@ -92,48 +99,53 @@ const Layout = () => {
         }}
       >
         <Container maxWidth="xl">
-          <Toolbar disableGutters>
-            {!isSideBarOpen ? (
-              <IconButton
-                onClick={handleOpenNavMenu}
+          <Toolbar
+            disableGutters
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              {!isSideBarOpen ? (
+                <IconButton
+                  onClick={handleOpenNavMenu}
+                  sx={{
+                    marginRight: 1,
+                    transform: "rotate(180deg)",
+                  }}
+                >
+                  <KeyboardDoubleArrowLeftIcon />
+                </IconButton>
+              ) : null}
+              <Typography
+                variant="h6"
+                noWrap
                 sx={{
-                  marginRight: 1,
-                  transform: "rotate(180deg)",
+                  mr: 2,
+                  display: "flex",
+                  fontWeight: 700,
+                  letterSpacing: ".1rem",
+                  color: "black",
+                  textDecoration: "none",
+                  textTransform: "capitalize",
                 }}
               >
-                <KeyboardDoubleArrowLeftIcon sx={{ color: "#fff" }} />
-              </IconButton>
-            ) : null}
-            <Typography
-              variant="h6"
-              noWrap
-              sx={{
-                mr: 2,
-                display: "flex",
-                fontWeight: 700,
-                letterSpacing: ".1rem",
-                color: "inherit",
-                textDecoration: "none",
-                textTransform: "capitalize",
-              }}
-            >
-              space
-            </Typography>
+                space
+              </Typography>
+            </Box>
 
             {/* start of big screen */}
 
             <ButtonGroup sx={{ alignItems: "center", flexGrow: 1, ml: 3 }}>
               <IconButton
                 sx={{
-                  color: "white",
                   borderRadius: 1,
                   width: 80,
                   height: 30,
                   ...(tasksView === TasksView.board
                     ? {
-                        backgroundColor: "#fff",
                         color: "#1F2937",
-                        ":hover": { backgroundColor: "#fff" },
                       }
                     : {}),
                 }}
@@ -145,15 +157,12 @@ const Layout = () => {
 
               <IconButton
                 sx={{
-                  color: "white",
                   borderRadius: 1,
                   width: 80,
                   height: 30,
                   ...(tasksView === TasksView.list
                     ? {
-                        backgroundColor: "#fff",
                         color: "#1F2937",
-                        ":hover": { backgroundColor: "#fff" },
                       }
                     : {}),
                 }}
@@ -164,30 +173,31 @@ const Layout = () => {
               </IconButton>
             </ButtonGroup>
 
-            <Box sx={{ flexGrow: 0 }}>
+            <Box sx={{ flexGrow: 0, display: "flex", gap: 2 }}>
+              <Notifications />
+
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar
                     alt={user?.name?.toUpperCase() ?? ""}
                     src="/static/images/avatar/2.jpg"
                     sx={{
-                      backgroundColor: "white",
-                      color: "black",
-                      height: 32,
-                      width: 32,
-                      ":hover": {
-                        backgroundColor: "lightgrey",
-                      },
+                      backgroundColor: "#1F2937",
+                      color: "white",
+                      height: 30,
+                      width: 30,
+                      fontSize: 16,
                     }}
                   />
                 </IconButton>
               </Tooltip>
+
               <ThemeProvider theme={theme}>
                 <Menu
                   sx={{
                     mt: "45px",
                     width: 300,
-                    minWidth: 200,
+                    minWidth: 300,
                     maxWidth: "unset",
                   }}
                   id="menu-appbar"
@@ -223,20 +233,20 @@ const Layout = () => {
                         width: 40,
                       }}
                     />
-                    <p>{user && user.name}</p>
+                    <p className="font-semibold">{user && user?.name}</p>
                   </MenuItem>
 
                   <MenuItem
+                    onClick={handleProfileSettings}
                     sx={{
-                      display: "flex",
-                      gap: 1,
                       ":hover": {
                         backgroundColor: "#E5E7EB",
                       },
                     }}
                   >
-                    <SettingsIcon fontSize="small" />
-                    <Link to="/profile-settings">Settings</Link>
+                    <p>
+                      <SettingsIcon fontSize="small" /> Settings
+                    </p>
                   </MenuItem>
 
                   <MenuItem
