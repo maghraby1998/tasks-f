@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 
+body {
+  font-family: "Roboto", sans-serif;
+}
+
 .test-style {
     border-color: blue !important;
     border-width: 10px !important;

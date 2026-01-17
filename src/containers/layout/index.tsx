@@ -9,7 +9,7 @@ import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import {
@@ -24,6 +24,8 @@ import { createTheme } from "@mui/material/styles";
 import { BorderAllRounded, List } from "@mui/icons-material";
 import TasksView from "../../enums/TasksView";
 import { client } from "../../graphql/client";
+import LogoutIcon from "@mui/icons-material/Logout";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 const theme = createTheme({
   components: {
@@ -105,12 +107,9 @@ const Layout = () => {
             <Typography
               variant="h6"
               noWrap
-              // component="a"
-              // href="/"
               sx={{
                 mr: 2,
-                display: "fl  ex",
-                fontFamily: "monospace",
+                display: "flex",
                 fontWeight: 700,
                 letterSpacing: ".1rem",
                 color: "inherit",
@@ -169,11 +168,13 @@ const Layout = () => {
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar
-                    alt={user?.name ?? ""}
+                    alt={user?.name?.toUpperCase() ?? ""}
                     src="/static/images/avatar/2.jpg"
                     sx={{
                       backgroundColor: "white",
                       color: "black",
+                      height: 32,
+                      width: 32,
                       ":hover": {
                         backgroundColor: "lightgrey",
                       },
@@ -185,7 +186,7 @@ const Layout = () => {
                 <Menu
                   sx={{
                     mt: "45px",
-                    width: 200,
+                    width: 300,
                     minWidth: 200,
                     maxWidth: "unset",
                   }}
@@ -203,12 +204,60 @@ const Layout = () => {
                   open={Boolean(anchorElUser)}
                   onClose={handleCloseUserMenu}
                 >
-                  <p className="px-[15px] border-b pb-2">{user && user.name}</p>
-                  {/* {settings.map((setting) => ( */}
-                  <MenuItem onClick={handleLogout}>
-                    <Typography textAlign="center">logout</Typography>
+                  <MenuItem
+                    onClick={handleLogout}
+                    sx={{
+                      display: "flex",
+                      gap: 1,
+                      mb: 2,
+                      py: 1,
+                      borderBottom: "1px solid #E5E7EB",
+                    }}
+                  >
+                    <Avatar
+                      alt={user?.name?.toUpperCase() ?? ""}
+                      src="/static/images/avatar/2.jpg"
+                      sx={{
+                        backgroundColor: "#1F2937",
+                        height: 40,
+                        width: 40,
+                      }}
+                    />
+                    <p>{user && user.name}</p>
                   </MenuItem>
-                  {/* ))} */}
+
+                  <MenuItem
+                    sx={{
+                      display: "flex",
+                      gap: 1,
+                      ":hover": {
+                        backgroundColor: "#E5E7EB",
+                      },
+                    }}
+                  >
+                    <SettingsIcon fontSize="small" />
+                    <Link to="/profile-settings">Settings</Link>
+                  </MenuItem>
+
+                  <MenuItem
+                    onClick={handleLogout}
+                    sx={{
+                      display: "flex",
+                      gap: 1,
+                      ":hover": {
+                        backgroundColor: "#E5E7EB",
+                      },
+                    }}
+                  >
+                    <LogoutIcon fontSize="small" />
+                    <Typography
+                      textAlign="center"
+                      className="capitalize"
+                      sx={{ fontSize: 14 }}
+                    >
+                      log out
+                    </Typography>
+                  </MenuItem>
                 </Menu>
               </ThemeProvider>
             </Box>
