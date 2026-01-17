@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import { IconButton, Popover, Tooltip } from "@mui/material";
 import { useState, useCallback } from "react";
@@ -7,19 +7,27 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import NotificationCard, {
   notification,
 } from "../../components/NotificationCard";
+import { MARK_NOTIFICATIONS_AS_READ } from "../../graphql/mutations";
 
 const Notifications = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const [markNotificationsAsRead] = useMutation(MARK_NOTIFICATIONS_AS_READ, {
+    onCompleted: () => {
+      refetch();
+    },
+  });
 
   const handleOpenNotifications = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
   const handleCloseNotifications = () => {
+    markNotificationsAsRead();
     setAnchorEl(null);
   };
 
-  const { data, fetchMore } = useQuery(GET_NOTIFICATIONS, {
+  const { data, fetchMore, refetch } = useQuery(GET_NOTIFICATIONS, {
     variables: {
       first: 5,
     },

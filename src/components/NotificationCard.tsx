@@ -23,7 +23,9 @@ const NotificationCard: React.FC<Props> = ({ notification }) => {
     >
       <p className="font-bold">{notification.title}</p>
       <p className="text-sm text-gray-600">{notification.message}</p>
-      <p>{moment(notification.created_at).fromNow()}</p>
+      <p className="text-sm text-gray-400">
+        {moment(notification.created_at).fromNow()}
+      </p>
     </div>
   );
 };

@@ -165,3 +165,11 @@ export const DELETE_DOCUMENT = gql`
     }
   }
 `;
+
+export const MARK_NOTIFICATIONS_AS_READ = gql`
+  mutation MarkNotificationsAsRead {
+    markNotificationsAsRead {
+      status
+    }
+  }
+`;
