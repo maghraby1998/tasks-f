@@ -8,6 +8,8 @@ import {
   MenuItem,
   Tooltip,
   ThemeProvider,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { GET_PROJECT_USERS, GET_TASK, project } from "../graphql/queries";
@@ -116,6 +118,7 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
   const [lightbox, setLightbox] = useState<any>({ isOpen: false, src: null });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [documents, setDocuments] = useState<any[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { data } = useQuery(GET_PROJECT_USERS, {
     skip: !modalData?.projectId,
@@ -148,7 +151,7 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
       onError: () => {
         refetch();
       },
-    }
+    },
   );
 
   const [deleteDocument, { loading: deleteLoading }] = useMutation(
@@ -157,11 +160,12 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
       onError: () => {
         refetch();
       },
-    }
+    },
   );
 
   const [addDocument] = useMutation(ADD_DOCUMENT_TO_TASK, {
-    onError: () => {
+    onError: (error) => {
+      setErrorMsg(error?.graphQLErrors?.[0]?.message);
       refetch();
     },
     refetchQueries: [
@@ -185,7 +189,7 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
       refetchQueries: [
         { query: project, variables: { id: modalData?.projectId } },
       ],
-    }
+    },
   );
 
   const [assignUserToTasl] = useMutation(ASSIGN_USER_TO_TASK, {
@@ -263,7 +267,7 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
   };
 
   const selectedUsers = data?.project?.users?.filter((user: any) =>
-    assignees?.map(Number).includes(+user?.id)
+    assignees?.map(Number).includes(+user?.id),
   );
 
   const handleChangeTaskName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -319,7 +323,7 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
       },
       onCompleted: (data) => {
         setDocuments((prev) =>
-          prev?.filter((doc: any) => doc?.id != data?.deleteDocument?.id)
+          prev?.filter((doc: any) => doc?.id != data?.deleteDocument?.id),
         );
       },
     });
@@ -360,7 +364,7 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
                 style={{
                   fontSize: 16,
                   backgroundColor: data?.project?.stages?.find(
-                    (projectStage: any) => projectStage?.id == stage
+                    (projectStage: any) => projectStage?.id == stage,
                   )?.color,
                   borderRadius: 5,
                   color: "white",
@@ -370,7 +374,7 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
               >
                 {
                   data?.project?.stages?.find(
-                    (projectStage: any) => projectStage?.id == stage
+                    (projectStage: any) => projectStage?.id == stage,
                   )?.name
                 }
               </IconButton>
@@ -522,6 +526,7 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
                 },
               });
             }}
+            accept="image/png, image/jpeg"
             ref={fileInputRef}
           />
 
@@ -576,6 +581,21 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
             />
           )}
         </div>
+
+        <Snackbar
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          open={!!errorMsg}
+          autoHideDuration={2000}
+          onClose={() => setErrorMsg(null)}
+        >
+          <Alert
+            onClose={() => setErrorMsg(null)}
+            severity="error"
+            sx={{ width: "100%" }}
+          >
+            {errorMsg}
+          </Alert>
+        </Snackbar>
       </ThemeProvider>
     </CustomModal>
   );

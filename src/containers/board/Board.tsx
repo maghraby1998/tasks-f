@@ -269,7 +269,7 @@ const Board: React.FC = () => {
                                         }}
                                       </Draggable>
                                     </>
-                                  )
+                                  ),
                                 )}
                                 <IconButton
                                   sx={{
