@@ -26,7 +26,7 @@ const Sidebar = () => {
   });
 
   const [expandedAccordion, setExpandedAccordion] = useState<string | null>(
-    null
+    null,
   );
 
   const handleAccordionChange = (active: string | null) => {
@@ -98,10 +98,10 @@ const Sidebar = () => {
           <IconButton
             sx={{
               borderRadius: 0,
-              backgroundColor: "#61677A",
+              backgroundColor: "#1F2937",
               color: "#fff",
               ":hover": {
-                color: "#61677A",
+                color: "#1F2937",
               },
             }}
             className="w-full h-[30px] "

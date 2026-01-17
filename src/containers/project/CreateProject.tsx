@@ -59,8 +59,8 @@ const CreateProject = () => {
             name,
             order,
             color: ColorService.convert("hex", color),
-          })
-        )
+          }),
+        ),
       );
     },
   });
@@ -160,7 +160,7 @@ const CreateProject = () => {
           sx={{
             fontSize: 18,
             textTransform: "capitalize",
-            backgroundColor: "#61677A",
+            backgroundColor: "#1F2937",
             color: "#fff",
             height: 30,
             width: 100,

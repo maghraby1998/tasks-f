@@ -156,11 +156,11 @@ const TaskForm: React.FC<Props> = ({ modalData, setModalData }) => {
   };
 
   const selectedUsers = data?.project?.users?.filter((user: any) =>
-    values.userIds?.map(Number).includes(+user?.id)
+    values.userIds?.map(Number).includes(+user?.id),
   );
 
   const availableAssignees = data?.project?.users?.filter(
-    (user: any) => !values.userIds?.map(Number).includes(+user?.id)
+    (user: any) => !values.userIds?.map(Number).includes(+user?.id),
   );
 
   console.log("ss", values, data?.project?.users);
@@ -268,7 +268,7 @@ const TaskForm: React.FC<Props> = ({ modalData, setModalData }) => {
           sx={{
             fontSize: 18,
             textTransform: "capitalize",
-            backgroundColor: "#61677A",
+            backgroundColor: "#1F2937",
             color: "#fff",
             height: 30,
             width: 100,

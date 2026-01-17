@@ -48,11 +48,11 @@ const Layout = () => {
   const tasksView = useSelector((state: RootState) => state.auth.tasksView);
 
   const isSideBarOpen = useSelector(
-    (state: RootState) => state.auth.isSideBarOpen
+    (state: RootState) => state.auth.isSideBarOpen,
   );
 
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
-    null
+    null,
   );
 
   const handleOpenNavMenu = () => {
@@ -82,7 +82,7 @@ const Layout = () => {
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor: "#61677A",
+          backgroundColor: "#1F2937",
           marginLeft: isSideBarOpen ? "250px" : 0,
           top: 0,
           left: 0,
@@ -133,7 +133,7 @@ const Layout = () => {
                   ...(tasksView === TasksView.board
                     ? {
                         backgroundColor: "#fff",
-                        color: "#61677A",
+                        color: "#1F2937",
                         ":hover": { backgroundColor: "#fff" },
                       }
                     : {}),
@@ -153,7 +153,7 @@ const Layout = () => {
                   ...(tasksView === TasksView.list
                     ? {
                         backgroundColor: "#fff",
-                        color: "#61677A",
+                        color: "#1F2937",
                         ":hover": { backgroundColor: "#fff" },
                       }
                     : {}),
@@ -169,8 +169,15 @@ const Layout = () => {
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar
-                    alt={user?.name ?? "user name"}
+                    alt={user?.name ?? ""}
                     src="/static/images/avatar/2.jpg"
+                    sx={{
+                      backgroundColor: "white",
+                      color: "black",
+                      ":hover": {
+                        backgroundColor: "lightgrey",
+                      },
+                    }}
                   />
                 </IconButton>
               </Tooltip>

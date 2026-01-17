@@ -96,7 +96,7 @@ const TaskCard: React.FC<Props> = ({ task, projectId, projectUsers }) => {
   };
 
   const handleOpenTaskMenu = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     setTaskMenu(e.currentTarget);
   };
@@ -125,33 +125,35 @@ const TaskCard: React.FC<Props> = ({ task, projectId, projectUsers }) => {
 
   return (
     <div className="text-sm relative task-card my-2 rounded overflow-hidden group">
-      <img
-        className="w-100 cursor-pointer mb-2"
-        src={`http://localhost:5000${task?.thumbnail?.path}`}
-      />
+      <div
+        className="bg-white absolute top-1 right-2 rounded hidden group-hover:block task-card-actions-shadow"
+        style={{
+          ...(!!taskMenu
+            ? {
+                display: "block",
+              }
+            : {}),
+        }}
+      >
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation();
+            handleOpenTaskMenu(e);
+          }}
+          size="small"
+        >
+          <MoreVert fontSize="small" />
+        </IconButton>
+      </div>
+
+      {task?.thumbnail?.path ? (
+        <img
+          className="w-100 cursor-pointer mb-2"
+          src={`http://localhost:5000${task?.thumbnail?.path}`}
+        />
+      ) : null}
 
       <div className="min-h-[100px] p-2">
-        <div
-          className="bg-white absolute top-1 right-2 rounded hidden group-hover:block task-card-actions-shadow"
-          style={{
-            ...(!!taskMenu
-              ? {
-                  display: "block",
-                }
-              : {}),
-          }}
-        >
-          <IconButton
-            onClick={(e) => {
-              e.stopPropagation();
-              handleOpenTaskMenu(e);
-            }}
-            size="small"
-          >
-            <MoreVert fontSize="small" />
-          </IconButton>
-        </div>
-
         <Menu
           open={!!taskMenu}
           anchorEl={taskMenu}
