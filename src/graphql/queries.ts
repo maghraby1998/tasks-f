@@ -124,13 +124,19 @@ export const GET_PROJECT_USERS = gql`
 `;
 
 export const GET_NOTIFICATIONS = gql`
-  query Notifications {
-    notifications {
-      id
-      title
-      message
-      isRead
-      created_at
+  query Notifications($first: Int!, $after: ID) {
+    notifications(first: $first, after: $after) {
+      notifications {
+        id
+        title
+        message
+        isRead
+        created_at
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
     }
   }
 `;
