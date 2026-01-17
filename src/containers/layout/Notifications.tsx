@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import { IconButton, Popover, Tooltip } from "@mui/material";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { GET_NOTIFICATIONS } from "../../graphql/queries";
 import InfiniteScroll from "react-infinite-scroll-component";
 import NotificationCard, {
@@ -21,27 +21,37 @@ const Notifications = () => {
 
   const { data, fetchMore } = useQuery(GET_NOTIFICATIONS, {
     variables: {
-      first: 2,
+      first: 5,
     },
   });
 
   const notifications = data?.notifications?.notifications ?? [];
 
-  console.log("notifications", notifications);
-
   const isUnRead = notifications?.find(
     (notification: any) => notification?.isRead == false,
   );
 
-  const handleFetchMore = () => {
-    if (data?.notification?.pageInfo?.hasNextPage) {
+  const handleFetchMore = useCallback(() => {
+    if (data?.notifications?.pageInfo?.hasNextPage) {
       fetchMore({
         variables: {
-          after: notifications?.[notifications?.length - 0]?.id,
+          after: notifications?.[notifications?.length - 1]?.id,
+        },
+        updateQuery: (prev, { fetchMoreResult }) => {
+          if (!fetchMoreResult) return prev;
+          return {
+            notifications: {
+              ...fetchMoreResult.notifications,
+              notifications: [
+                ...prev.notifications.notifications,
+                ...fetchMoreResult.notifications.notifications,
+              ],
+            },
+          };
         },
       });
     }
-  };
+  }, [data?.notifications?.pageInfo?.hasNextPage, notifications, fetchMore]);
 
   return (
     <>
@@ -79,29 +89,32 @@ const Notifications = () => {
         sx={{
           mt: "45px",
         }}
-        keepMounted
       >
-        <InfiniteScroll
-          dataLength={notifications?.length ?? 0} //This is important field to render the next data
-          next={handleFetchMore}
-          refreshFunction={() => {}}
-          hasMore={true}
-          loader={<h4>Loading...</h4>}
-          style={{
-            height: 500,
-            width: 400,
-            paddingBlock: 15,
-          }}
+        <div
+          id="scrollableDiv"
+          style={{ overflow: "auto", height: 400, width: 400 }}
         >
-          {notifications?.map((notification: notification) => (
-            <>
-              <div className="my-2">
-                <NotificationCard notification={notification} />
-              </div>
-              <hr />
-            </>
-          ))}
-        </InfiniteScroll>
+          <InfiniteScroll
+            dataLength={notifications?.length ?? 0}
+            next={handleFetchMore}
+            hasMore={data?.notifications?.pageInfo?.hasNextPage ?? false}
+            loader={<h4 style={{ textAlign: "center" }}>Loading...</h4>}
+            scrollableTarget="scrollableDiv"
+          >
+            {notifications?.length ? (
+              notifications?.map((notification: notification, i: number) => (
+                <div key={notification.id}>
+                  {i != 0 ? <hr /> : null}
+                  <div className="my-2">
+                    <NotificationCard notification={notification} />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>no notifications yet</p>
+            )}
+          </InfiniteScroll>
+        </div>
       </Popover>
     </>
   );
