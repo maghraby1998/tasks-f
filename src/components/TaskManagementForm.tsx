@@ -21,6 +21,7 @@ import {
   UNASSIGN_USER_FROM_TASK,
 } from "../graphql/mutations";
 import Lightbox from "yet-another-react-lightbox";
+import config from "../config";
 
 const CHAHNGE_TASK_NAME = gql`
   mutation changeTaskName($id: ID!, $name: String!) {
@@ -535,11 +536,11 @@ const TaskManagementForm: React.FC<Props> = ({ modalData, setModalData }) => {
               <div className="relative">
                 <img
                   className="h-[120px] w-[140px] cursor-pointer task-image"
-                  src={`http://localhost:5000${doc?.path}`}
+                  src={`${config.API_URI}${doc?.path}`}
                   onClick={() => {
                     setLightbox({
                       isOpen: true,
-                      src: `http://localhost:5000${doc?.path}`,
+                      src: `${config.API_URI}${doc?.path}`,
                     });
                   }}
                 />

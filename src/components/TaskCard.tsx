@@ -15,6 +15,7 @@ import {
 import { useMutation } from "@apollo/client";
 import { project } from "../graphql/queries";
 import Swal from "sweetalert2";
+import config from "../config";
 
 interface assignee {
   id: number;
@@ -149,7 +150,7 @@ const TaskCard: React.FC<Props> = ({ task, projectId, projectUsers }) => {
       {task?.thumbnail?.path ? (
         <img
           className="w-100 cursor-pointer mb-2"
-          src={`http://localhost:5000${task?.thumbnail?.path}`}
+          src={`${config.API_URI}${task?.thumbnail?.path}`}
         />
       ) : null}
 
